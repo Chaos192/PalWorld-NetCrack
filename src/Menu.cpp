@@ -68,7 +68,17 @@ namespace DX11_Base {
             ImGui::Checkbox("DefenseHack", &Config.IsDefuseModiler);
 
             ImGui::Checkbox("InfStamina", &Config.IsInfStamina);
-            
+
+            if (ImGui::Button("ToggleInfAmmo",ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
+            {
+                if (Config.GetPalPlayerCharacter()->ShooterComponent != NULL && Config.GetPalPlayerCharacter()->ShooterComponent->CanShoot())
+                {
+                    if (Config.GetPalPlayerCharacter()->ShooterComponent->GetHasWeapon() != NULL)
+                    {
+                        Config.GetPalPlayerCharacter()->ShooterComponent->GetHasWeapon()->IsRequiredBullet = !Config.GetPalPlayerCharacter()->ShooterComponent->GetHasWeapon()->IsRequiredBullet;
+                    }
+                }
+            }
             //��������һ��
             ImGui::SliderFloat("SpeedModifilers", &Config.SpeedModiflers, 1, 10);
             ImGui::SliderInt("AttackModifilers", &Config.DamageUp, 0, 200000);
@@ -88,6 +98,30 @@ namespace DX11_Base {
         {
             //�����õİ�
             //Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState()->RequestSpawnMonsterForPlayer(name, 5, 1);
+            ImGui::Checkbox("SafeTeleport", &Config.IsSafe);
+            if (ImGui::Button("ExploitTP", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
+            {
+                SDK::APalPlayerCharacter* p_appc = Config.GetPalPlayerCharacter();
+                if (p_appc != NULL)
+                {
+                    if (Config.GetPalPlayerCharacter()->GetPalPlayerController() != NULL)
+                    {
+                        if (Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState() != NULL)
+                        {
+                            if (Config.IsSafe)
+                            {
+                                Config.GetPalPlayerCharacter()->GetPalPlayerController()->TeleportToSafePoint_ToServer();
+                            }
+                            else
+                            {
+                                Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState()->RequestRespawn();
+                            }
+
+                        }
+                    }
+                }
+
+            }
             if (ImGui::Button("ExploitFly", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
             {
                 ExploitFly(true);
@@ -96,17 +130,6 @@ namespace DX11_Base {
             {
                 ExploitFly(false);
             }
-            if (ImGui::Button("Respawn", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
-            {
-                SDK::APalPlayerCharacter* p_appc = Config.GetPalPlayerCharacter();
-                if (p_appc != NULL)
-                {
-                    if (Config.GetPalPlayerCharacter()->GetPalPlayerController() != NULL)
-                    {
-                        Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState()->RequestRespawn();
-                    }
-                }
-            }
             if (ImGui::Button("DeleteSelf", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
             {
                 SDK::APalPlayerCharacter* p_appc = Config.GetPalPlayerCharacter();
@@ -114,11 +137,30 @@ namespace DX11_Base {
                 {
                     if (Config.GetPalPlayerCharacter()->GetPalPlayerController() != NULL)
                     {
-                        Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState()->Debug_RequestDeletePlayerSelf_ToServer();
+                        if (Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState() != NULL)
+                        {
+                            Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState()->Debug_RequestDeletePlayerSelf_ToServer();
+                        }
                     }
                 }
             }
-
+            if (ImGui::Button("GodHealth", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
+            {
+                SDK::APalPlayerCharacter* p_appc = Config.GetPalPlayerCharacter();
+                if (p_appc != NULL)
+                {
+                    if (Config.GetPalPlayerCharacter()->GetPalPlayerController() != NULL)
+                    {
+                        if (Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState() != NULL)
+                        {
+                            SDK::FFixedPoint fixpoint = SDK::FFixedPoint();
+                            fixpoint.Value = 99999999;
+                            Config.GetPalPlayerCharacter()->ReviveCharacter_ToServer(fixpoint);
+                        }
+                    }
+                }
+            }
+            
         }
         void TABConfig()
         {
@@ -131,6 +173,7 @@ namespace DX11_Base {
             if (ImGui::Button("UNHOOK DLL", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20))) {
 #if DEBUG
                 g_Console->printdbg("\n\n[+] UNHOOK INITIALIZED [+]\n\n", g_Console->color.red);
+
 #endif
                 g_KillSwitch = TRUE;
             }
@@ -207,6 +250,46 @@ namespace DX11_Base {
 
     void Menu::Loops()
     {
+        if ((GetAsyncKeyState(VK_F5) & 1))
+        {
+            SDK::APalPlayerCharacter* p_appc = Config.GetPalPlayerCharacter();
+            if (p_appc != NULL)
+            {
+                if (Config.GetPalPlayerCharacter()->GetPalPlayerController() != NULL)
+                {
+                    if (Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState() != NULL)
+                    {
+                        if (Config.IsSafe)
+                        {
+                            Config.GetPalPlayerCharacter()->GetPalPlayerController()->TeleportToSafePoint_ToServer();
+                        }
+                        else
+                        {
+                            Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState()->RequestRespawn();
+
+                        }
+
+                    }
+                }
+            }
+        }
+        if ((GetAsyncKeyState(VK_F6) & 1))
+        {
+            SDK::APalPlayerCharacter* p_appc = Config.GetPalPlayerCharacter();
+            if (p_appc != NULL)
+            {
+                if (Config.GetPalPlayerCharacter()->GetPalPlayerController() != NULL)
+                {
+                    if (Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState() != NULL)
+                    {
+                        SDK::FFixedPoint fixpoint = SDK::FFixedPoint();
+                        fixpoint.Value = 99999999;
+                        Config.GetPalPlayerCharacter()->ReviveCharacter_ToServer(fixpoint);
+
+                    }
+                }
+            }
+        }
         if (Config.IsSpeedHack)
         {
             if (Config.GetUWorld()
@@ -246,5 +329,6 @@ namespace DX11_Base {
                 }
             }
         }
-	}
+ 
+    }
 }

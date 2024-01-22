@@ -17,7 +17,7 @@ namespace DX11_Base {
 
 	void Hooking::Hook()
 	{
-		//ÔÚÕâÀï×¢²áHOOK
+		//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×¢ï¿½ï¿½HOOK
 		g_GameVariables->Init();
 		g_D3D11Window->Hook();
 		Config.Init();

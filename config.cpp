@@ -6,6 +6,7 @@ config Config;
 Tick TickFunc;
 Tick OldTickFunc;
 
+
 bool DetourTick(SDK::APalPlayerCharacter* m_this,float DeltaSecond)
 {
     if (m_this->GetPalPlayerController() != NULL)
@@ -43,5 +44,7 @@ void config::Init()
     //����IsAdjustLocation��������
     Config.ClientBase = (DWORD64)GetModuleHandleA("PalWorld-Win64-Shipping.exe");
     TickFunc = (Tick)(Config.ClientBase + Config.offset_Tick);
+
     MH_CreateHook(TickFunc, DetourTick, reinterpret_cast<void**>(&OldTickFunc));
+
 }

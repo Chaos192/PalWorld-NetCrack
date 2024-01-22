@@ -5,6 +5,7 @@
 
 typedef bool(*Tick)(SDK::APalPlayerCharacter* m_this,float DeltaSecond);
 
+
 class config
 {
 public:
@@ -17,6 +18,8 @@ public:
 	bool IsAttackModiler = false;
 	bool IsDefuseModiler = false;
 	bool IsInfStamina = false;
+	bool IsSafe = true;
+	bool IsInfinAmmo = false;
 
 	//����
 	float SpeedModiflers = 1.0f;
