@@ -325,7 +325,7 @@ namespace DX11_Base {
             {
                 if (Config.GetPalPlayerCharacter()->CharacterParameterComponent != NULL)
                 {
-                    Config.GetPalPlayerCharacter()->CharacterParameterComponent->SP.Value = 9999;
+                    Config.GetPalPlayerCharacter()->CharacterParameterComponent->ResetSP();
                 }
             }
         }
