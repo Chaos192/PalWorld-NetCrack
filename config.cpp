@@ -14,6 +14,7 @@ bool DetourTick(SDK::APalPlayerCharacter* m_this,float DeltaSecond)
         if (m_this->GetPalPlayerController()->IsLocalPlayerController())
         {
             Config.localPlayer = m_this;
+            
         }
     }
         return OldTickFunc(m_this, DeltaSecond);

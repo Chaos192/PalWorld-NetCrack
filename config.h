@@ -20,6 +20,7 @@ public:
 	bool IsInfStamina = false;
 	bool IsSafe = true;
 	bool IsInfinAmmo = false;
+	bool IsMuteki = false;
 
 	//����
 	float SpeedModiflers = 1.0f;

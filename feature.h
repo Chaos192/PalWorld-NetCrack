@@ -5,5 +5,5 @@
 
 void ESP();
 
-void DrawPlayerList(ImColor color);
+void DrawUActorComponent(SDK::TArray<SDK::UActorComponent*> Comps,ImColor color);
 

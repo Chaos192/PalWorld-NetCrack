@@ -249,8 +249,6 @@ namespace DX11_Base {
 
 		//	Render Menu Loop
 		g_Menu->Draw();
-		//͸��
-		ESP();
 		ImGui::EndFrame();
 		ImGui::Render();
 		m_DeviceContext->OMSetRenderTargets(1, &m_RenderTargetView, NULL);

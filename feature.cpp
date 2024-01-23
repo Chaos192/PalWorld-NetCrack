@@ -3,26 +3,27 @@
 
 void ESP()
 {
-	if (Config.IsESP)
+	if (Config.GetPalPlayerCharacter() != NULL)
 	{
-		DrawPlayerList(ImColor(128,0,0));
+		if (Config.GetPalPlayerCharacter()->GetPalPlayerController() != NULL)
+		{
+			
+				DrawUActorComponent(Config.GetPalPlayerCharacter()->BlueprintCreatedComponents, ImColor(128, 0, 0));
+		}
 	}
 }
-
-void DrawPlayerList(ImColor color)
+void DrawUActorComponent(SDK::TArray<SDK::UActorComponent*> Comps,ImColor color)
 {
 	ImGui::GetBackgroundDrawList()->AddText(nullptr, 16, ImVec2(ImGui::GetIO().DisplaySize.x / 2, ImGui::GetIO().DisplaySize.y / 2), color, "Drawing...");
-	
-
-	SDK::TArray<SDK::AActor*> actors = *(SDK::TArray<SDK::AActor*>*)(*((uint64_t*)(*(uint64_t*)(Config.GetUWorld()->PersistentLevel))+0x098));
-	
-	if (actors.IsValid())
+	if (Comps.IsValid())
 	{
-		for (int i = 0; i < actors.Num(); i++)
+		for (int i = 0; i < Comps.Num(); i++)
 		{
-			if (actors[i] != NULL)
+			
+			if (Comps[i] != NULL)
 			{
-				ImGui::GetBackgroundDrawList()->AddText(nullptr, 16, ImVec2(10, 10 + (i * 30)), color, actors[i]->GetFullName().c_str());
+				
+				ImGui::GetBackgroundDrawList()->AddText(nullptr, 16, ImVec2(10, 10 + (i * 30)), color, Comps[i]->GetFullName().c_str());
 			}
 		}
 	}

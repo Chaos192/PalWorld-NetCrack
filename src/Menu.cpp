@@ -69,6 +69,9 @@ namespace DX11_Base {
 
             ImGui::Checkbox("InfStamina", &Config.IsInfStamina);
 
+            //Creadit Mokobake
+            //ImGui::Checkbox("MuteKiGodmode", &Config.IsMuteki);
+
             if (ImGui::Button("ToggleInfAmmo",ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
             {
                 if (Config.GetPalPlayerCharacter()->ShooterComponent != NULL && Config.GetPalPlayerCharacter()->ShooterComponent->CanShoot())
@@ -79,6 +82,7 @@ namespace DX11_Base {
                     }
                 }
             }
+            //Talk: Teleport or Shop anywhere Config.GetPalPlayerCharacter()->GetPalPlayerController()->Transmitter->Character->NotifyTalkStart_ToServer()
             //��������һ��
             ImGui::SliderFloat("SpeedModifilers", &Config.SpeedModiflers, 1, 10);
             ImGui::SliderInt("AttackModifilers", &Config.DamageUp, 0, 200000);
@@ -156,11 +160,43 @@ namespace DX11_Base {
                             SDK::FFixedPoint fixpoint = SDK::FFixedPoint();
                             fixpoint.Value = 99999999;
                             Config.GetPalPlayerCharacter()->ReviveCharacter_ToServer(fixpoint);
+                            
                         }
                     }
                 }
             }
-            
+            //Creadit WoodgamerHD
+            if (ImGui::Button("MAX Level<50>", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
+            {
+                SDK::APalPlayerCharacter* p_appc = Config.GetPalPlayerCharacter();
+                if (p_appc != NULL)
+                {
+                    if (Config.GetPalPlayerCharacter()->GetPalPlayerController() != NULL)
+                    {
+                        if (Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState() != NULL)
+                        {
+                            Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState()->GrantExpForParty(99999999);
+                        }
+                    }
+                }
+            }
+            /** Useful
+            if (ImGui::Button("testTP", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
+            {
+                if (Config.GetPalPlayerCharacter() != NULL)
+                {
+                    if (Config.GetPalPlayerCharacter()->GetPalPlayerController())
+                    {
+
+                        SDK::FGuid guid = Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPlayerUId();
+                        SDK::FVector vector = Config.GetPalPlayerCharacter()->GetTransform().Translation;
+                        SDK::FVector ca_vector = { vector.X + 3000,vector.Y + 100,vector.Z + 3000 };
+                        Config.GetPalPlayerCharacter()->GetPalPlayerController()->Transmitter->Player->RegisterRespawnLocation_ToServer(guid, ca_vector);
+                        Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState()->RequestRespawn();
+                    }
+                }
+            }
+            **/
         }
         void TABConfig()
         {
@@ -182,6 +218,10 @@ namespace DX11_Base {
 
 	void Menu::Draw()
 	{
+        if (Config.IsESP)
+        {
+            ESP();
+        }
 		if (g_GameVariables->m_ShowMenu)
 			MainMenu();
 
@@ -309,6 +349,15 @@ namespace DX11_Base {
                 }
             }
         }
+        //Creadit Mokobake
+        /**
+           if (Config.GetPalPlayerCharacter() != NULL)
+            {
+                if (Config.GetPalPlayerCharacter()->CharacterParameterComponent != NULL)
+                {
+                    Config.GetPalPlayerCharacter()->CharacterParameterComponent->bIsEnableMuteki = Config.IsMuteki;
+                }
+            }**/
         if (Config.IsDefuseModiler)
         {
             if (Config.GetPalPlayerCharacter() != NULL && Config.GetPalPlayerCharacter()->CharacterParameterComponent->DefenseUp != Config.DefuseUp)
