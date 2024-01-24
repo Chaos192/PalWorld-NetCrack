@@ -2,6 +2,31 @@
 #include "../include/Menu.hpp"
 #include "SDK.hpp"
 #include "config.h"
+
+//Talk: Teleport or Shop anywhere Config.GetPalPlayerCharacter()->GetPalPlayerController()->Transmitter->Character->NotifyTalkStart_ToServer()
+void AnyWhereTP(SDK::FVector& vector,bool IsSafe)
+{
+    if (!IsSafe)
+    {
+        if (Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState() != NULL)
+        {
+
+            SDK::FGuid guid = Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPlayerUId();
+            vector = { vector.X,vector.Y + 100,vector.Z };
+            Config.GetPalPlayerCharacter()->GetPalPlayerController()->Transmitter->Player->RegisterRespawnLocation_ToServer(guid, vector);
+            Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState()->RequestRespawn();
+        }
+    }
+    else
+        {
+            if (Config.GetPalPlayerCharacter()->GetPalPlayerController())
+            {
+                vector = { vector.X,vector.Y + 100,vector.Z };
+                Config.GetPalPlayerCharacter()->GetPalPlayerController()->Debug_Teleport2D(vector);
+            }
+        }
+    return;
+}
 void ExploitFly(bool IsFly)
 {
     SDK::APalPlayerCharacter* p_appc = Config.GetPalPlayerCharacter();
@@ -23,6 +48,7 @@ void ExploitFly(bool IsFly)
         }
 
     }
+    return;
 }
 
 namespace DX11_Base {
@@ -82,13 +108,11 @@ namespace DX11_Base {
                     }
                 }
             }
-            //Talk: Teleport or Shop anywhere Config.GetPalPlayerCharacter()->GetPalPlayerController()->Transmitter->Character->NotifyTalkStart_ToServer()
-            //��������һ��
+            
             ImGui::SliderFloat("SpeedModifilers", &Config.SpeedModiflers, 1, 10);
             ImGui::SliderInt("AttackModifilers", &Config.DamageUp, 0, 200000);
             ImGui::SliderInt("defenseModifilers", &Config.DefuseUp, 0, 200000);
             
-            //��ť����һ��
             if (ImGui::Button("PrintPlayerAddr", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
             {
                 SDK::APalPlayerCharacter* p_appc = Config.GetPalPlayerCharacter();
@@ -100,10 +124,12 @@ namespace DX11_Base {
         }
         void TABExploit()
         {
-            //�����õİ�
             //Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState()->RequestSpawnMonsterForPlayer(name, 5, 1);
             ImGui::Checkbox("SafeTeleport", &Config.IsSafe);
-            if (ImGui::Button("ExploitTP", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
+            ImGui::InputFloat3("Pos:", Config.Pos);
+            ImGui::InputInt("EXP:", &Config.EXP);
+            ImGui::InputInt("ItemNum:", &Config.Item);
+            if (ImGui::Button("HomeTP", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
             {
                 SDK::APalPlayerCharacter* p_appc = Config.GetPalPlayerCharacter();
                 if (p_appc != NULL)
@@ -124,15 +150,25 @@ namespace DX11_Base {
                         }
                     }
                 }
-
             }
-            if (ImGui::Button("ExploitFly", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
+            if (ImGui::Button("AnywhereTP", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
             {
-                ExploitFly(true);
+                if (Config.GetPalPlayerCharacter()!= NULL)
+                {
+                    if (Config.GetPalPlayerCharacter()->GetPalPlayerController() != NULL)
+                    {
+                        if (Config.Pos != NULL)
+                        {
+                            SDK::FVector vector = { Config.Pos[0],Config.Pos[1],Config.Pos[2] };
+                            AnyWhereTP(vector,Config.IsSafe);
+                        }
+                    }
+                }
             }
-            if (ImGui::Button("DisableFly", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
+            if (ImGui::Button("ToggleFly", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
             {
-                ExploitFly(false);
+                Config.IsToggledFly = !Config.IsToggledFly;
+                ExploitFly(Config.IsToggledFly);
             }
             if (ImGui::Button("DeleteSelf", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
             {
@@ -166,7 +202,7 @@ namespace DX11_Base {
                 }
             }
             //Creadit WoodgamerHD
-            if (ImGui::Button("MAX Level<50>", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
+            if (ImGui::Button("Give EXP<Num>", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
             {
                 SDK::APalPlayerCharacter* p_appc = Config.GetPalPlayerCharacter();
                 if (p_appc != NULL)
@@ -175,28 +211,47 @@ namespace DX11_Base {
                     {
                         if (Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState() != NULL)
                         {
-                            Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState()->GrantExpForParty(99999999);
+                            if (Config.EXP >= 0)
+                            {
+                                Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState()->GrantExpForParty(Config.EXP);
+                            }
                         }
                     }
                 }
             }
-            /** Useful
-            if (ImGui::Button("testTP", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
+            //Creadit Kaotic13
+            if (ImGui::Button("Give<Num>first item", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
             {
-                if (Config.GetPalPlayerCharacter() != NULL)
+                SDK::APalPlayerCharacter* p_appc = Config.GetPalPlayerCharacter();
+                if (p_appc != NULL)
                 {
-                    if (Config.GetPalPlayerCharacter()->GetPalPlayerController())
+                    if (Config.GetPalPlayerCharacter()->GetPalPlayerController() != NULL)
                     {
+                        if (Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState() != NULL)
+                        {
+                            SDK::UPalPlayerInventoryData* InventoryData = Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState()->GetInventoryData();
+                            if (InventoryData != NULL) {
+                                SDK::UPalItemContainerMultiHelper* InventoryMultiHelper = InventoryData->InventoryMultiHelper;
+                                if (InventoryMultiHelper != NULL) {
+                                    SDK::TArray<class SDK::UPalItemContainer*> Containers = InventoryMultiHelper->Containers;
+                                    if (Containers.Num() == 0) {
+                                        return;
+                                    }
 
-                        SDK::FGuid guid = Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPlayerUId();
-                        SDK::FVector vector = Config.GetPalPlayerCharacter()->GetTransform().Translation;
-                        SDK::FVector ca_vector = { vector.X + 3000,vector.Y + 100,vector.Z + 3000 };
-                        Config.GetPalPlayerCharacter()->GetPalPlayerController()->Transmitter->Player->RegisterRespawnLocation_ToServer(guid, ca_vector);
-                        Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState()->RequestRespawn();
+                                    SDK::UPalItemSlot* FirstSlot = Containers[0]->Get(0);
+
+                                    if (FirstSlot != NULL)
+                                    {
+                                        SDK::FPalItemId FirstItemId = FirstSlot->GetItemId();
+                                        int32 StackCount = FirstSlot->GetStackCount();
+                                        InventoryData->RequestAddItem(FirstItemId.StaticId, StackCount * Config.Item, true);
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
-            **/
         }
         void TABConfig()
         {
