@@ -3,16 +3,16 @@
 
 void ESP()
 {
-	/**
 	if (Config.GetPalPlayerCharacter() != NULL)
 	{
-		if (Config.GetPalPlayerCharacter()->GetPalPlayerController() != NULL)
+		if (Config.GetPalPlayerCharacter()->ShooterComponent != NULL)
 		{
-			
-				DrawUActorComponent(Config.GetPalPlayerCharacter()->BlueprintCreatedComponents, ImColor(128, 0, 0));
+			if(Config.GetPalPlayerCharacter()->ShooterComponent->GetHasWeapon() != NULL)
+			{
+				DrawUActorComponent(Config.GetPalPlayerCharacter()->ShooterComponent->GetHasWeapon()->InstanceComponents, ImColor(128, 0, 0));
+			}
 		}
 	}
-	**/
 }
 void DrawUActorComponent(SDK::TArray<SDK::UActorComponent*> Comps,ImColor color)
 {

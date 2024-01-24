@@ -11,6 +11,7 @@ GetAllPlayer OldGetAllPlayerFunc;
 
 void DetourPlayers(SDK::UPalCharacterImportanceManager* i_this, SDK::TArray<SDK::APalCharacter*>* OutArray)
 {
+    Config.UCIM = i_this;
     if(i_this->PlayerList.IsValid())
     {
         Config.AllPlayers = i_this->PlayerList_ForOutsideGet;
@@ -60,6 +61,7 @@ SDK::TArray<SDK::APalPlayerCharacter*> config::GetTAllPlayers()
 
 void config::Init()
 {
+    //register hook
     Config.ClientBase = (DWORD64)GetModuleHandleA("PalWorld-Win64-Shipping.exe");
     
     TickFunc = (Tick)(Config.ClientBase + Config.offset_Tick);

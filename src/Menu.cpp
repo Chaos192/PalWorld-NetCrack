@@ -3,6 +3,49 @@
 #include "SDK.hpp"
 #include "config.h"
 
+
+SDK::FPalDebugOtomoPalInfo palinfo = SDK::FPalDebugOtomoPalInfo();
+SDK::TArray<SDK::EPalWazaID> EA = { 0U };
+void AddItem(SDK::UPalPlayerInventoryData* data,char* itemName, int count)
+{
+    SDK::UKismetStringLibrary* lib = SDK::UKismetStringLibrary::GetDefaultObj();
+
+    //Convert FNAME
+    wchar_t  ws[255];
+    swprintf(ws, 255, L"%hs",itemName);
+    SDK::FName Name = lib->Conv_StringToName(SDK::FString(ws));
+    //Call
+    data->RequestAddItem(Name, count, true);
+}
+void SpawnPal(char* PalName,int rank, int lvl = 1)
+{
+    SDK::UKismetStringLibrary* lib = SDK::UKismetStringLibrary::GetDefaultObj();
+
+    //Convert FNAME
+    wchar_t  ws[255];
+    swprintf(ws, 255, L"%hs", PalName);
+    SDK::FName Name = lib->Conv_StringToName(SDK::FString(ws));
+    //Call
+    if (Config.GetPalPlayerCharacter() != NULL)
+    {
+        if (Config.GetPalPlayerCharacter()->GetPalPlayerController() != NULL)
+        {
+            if (Config.GetPalPlayerCharacter()->GetPalPlayerController())
+            {
+                if (Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState())
+                {
+                    EA[0] = SDK::EPalWazaID::AirCanon;
+                    palinfo.Level = lvl;
+                    palinfo.Rank = rank;
+                    palinfo.PalName.Key = Name;
+                    palinfo.WazaList = EA;
+                    palinfo.PassiveSkill = NULL;
+                    Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState()->Debug_CaptureNewMonsterByDebugOtomoInfo_ToServer(palinfo);
+                }
+            }
+        }
+    }
+}
 //Talk: Teleport or Shop anywhere Config.GetPalPlayerCharacter()->GetPalPlayerController()->Transmitter->Character->NotifyTalkStart_ToServer()
 void AnyWhereTP(SDK::FVector& vector,bool IsSafe)
 {
@@ -128,7 +171,51 @@ namespace DX11_Base {
             ImGui::Checkbox("SafeTeleport", &Config.IsSafe);
             ImGui::InputFloat3("Pos:", Config.Pos);
             ImGui::InputInt("EXP:", &Config.EXP);
-            ImGui::InputInt("ItemNum:", &Config.Item);
+            ImGui::InputText("ItemName", Config.ItemName,sizeof(Config.ItemName));
+            ImGui::InputInt("ItemNum", &Config.Item);
+            if (ImGui::Button("Give item", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
+            {
+                SDK::APalPlayerCharacter* p_appc = Config.GetPalPlayerCharacter();
+                if (p_appc != NULL)
+                {
+
+                    if (Config.GetPalPlayerCharacter()->GetPalPlayerController() != NULL)
+                    {
+                        if (Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState() != NULL)
+                        {
+                            SDK::UPalPlayerInventoryData* InventoryData = Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState()->GetInventoryData();
+                            if (InventoryData != NULL)
+                            {
+                                if (Config.ItemName != NULL)
+                                {
+                                    g_Console->printdbg("\n\n[+] ItemName: %s [+]\n\n", g_Console->color.green, Config.ItemName);
+                                    AddItem(InventoryData, Config.ItemName, Config.Item);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            ImGui::InputText("PalName", Config.PalName, sizeof(Config.PalName));
+            ImGui::InputInt("PalRank", &Config.PalRank);
+            ImGui::InputInt("Pallvl", &Config.PalLvL);
+            if (ImGui::Button("Spawn Pal", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
+            {
+                if (Config.GetPalPlayerCharacter() != NULL)
+                {
+                    if (Config.GetPalPlayerCharacter()->GetPalPlayerController() != NULL)
+                    {
+                        if (Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState() != NULL)
+                        {
+                            if (Config.PalName != NULL)
+                            {
+                                g_Console->printdbg("\n\n[+] PalName: %s [+]\n\n", g_Console->color.green, Config.ItemName);
+                                SpawnPal(Config.PalName,Config.PalRank,Config.PalLvL);
+                            }
+                        }
+                    }
+                }
+            }
             if (ImGui::Button("HomeTP", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
             {
                 SDK::APalPlayerCharacter* p_appc = Config.GetPalPlayerCharacter();
@@ -201,42 +288,9 @@ namespace DX11_Base {
                     }
                 }
             }
-            if (ImGui::Button("test", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
-            {
-
-                g_Console->printdbg("\n\n[+] WorldContextObject: %x [+]\n\n", g_Console->color.green,Config.WorldContextObject);
-
-                if (Config.GetTAllPlayers().IsValid())
-                {
-                    SDK::TArray<SDK::APalPlayerCharacter*> T = Config.GetTAllPlayers();
-                    for (int i =0;i< T.Num();i++)
-                    {
-                        g_Console->printdbg("\n\n[+] APalPlayerCharacter: %x [+]\n\n", g_Console->color.green,T[i]);
-                        if (T[i]->GetPalPlayerController() != NULL)
-                        {
-                            if (T[i]->GetPalPlayerController()->IsLocalController())
-                            {
-                                g_Console->printdbg("\n\n[+] Finded APalPlayerCharacter:[+]\n\n", g_Console->color.green);
-                            }
-                            if (T[i] != NULL)
-                            {
-                                if (T[i]->GetPalPlayerController()->GetPalPlayerState() != NULL)
-                                {
-                                    SDK::FFixedPoint fixpoint = SDK::FFixedPoint();
-                                    fixpoint.Value = 99999999;
-                                    T[i]->ReviveCharacter_ToServer(fixpoint);
-                                }
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    g_Console->printdbg("\n\n[+]GetTAllPlayers().IsInValid[+]\n\n", g_Console->color.red);
-                }
-            }
+           
             //Creadit WoodgamerHD
-            if(ImGui::Button("Give EXP<Num>", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
+            if(ImGui::Button("Give exp", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
             {
                 SDK::APalPlayerCharacter* p_appc = Config.GetPalPlayerCharacter();
                 if (p_appc != NULL)
@@ -254,39 +308,9 @@ namespace DX11_Base {
                 }
             }
             //Creadit Kaotic13
-            if (ImGui::Button("Give<Num>first item", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
-            {
-                SDK::APalPlayerCharacter* p_appc = Config.GetPalPlayerCharacter();
-                if (p_appc != NULL)
-                {
-
-                    if (Config.GetPalPlayerCharacter()->GetPalPlayerController() != NULL)
-                    {
-                        if (Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState() != NULL)
-                        {
-                            SDK::UPalPlayerInventoryData* InventoryData = Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState()->GetInventoryData();
-                            if (InventoryData != NULL) {
-                                SDK::UPalItemContainerMultiHelper* InventoryMultiHelper = InventoryData->InventoryMultiHelper;
-                                if (InventoryMultiHelper != NULL) {
-                                    SDK::TArray<class SDK::UPalItemContainer*> Containers = InventoryMultiHelper->Containers;
-                                    if (Containers.Num() == 0) {
-                                        return;
-                                    }
-
-                                    SDK::UPalItemSlot* FirstSlot = Containers[0]->Get(0);
-
-                                    if (FirstSlot != NULL)
-                                    {
-                                        SDK::FPalItemId FirstItemId = FirstSlot->GetItemId();
-                                        int32 StackCount = FirstSlot->GetStackCount();
-                                        InventoryData->RequestAddItem(FirstItemId.StaticId, StackCount * Config.Item, true);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            
+            
+  
         }
         void TABConfig()
         {
