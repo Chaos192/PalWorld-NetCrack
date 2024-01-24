@@ -18,5 +18,6 @@ AnywhereTP(It requires you to manually give a position)
 ToggleFly  
 DeleteSelf(Warning: After testing, it will delete your data on the server)  
 GodHealth  
-Give EXP<Num>(Creadit:WoodgamerHD)  
-Give<Num>first item(Creadit:Kaotic13)  
+Give EXP(Creadit:WoodgamerHD)  
+Give item(Creadit:Kaotic13)  
+# Spawn Pal
