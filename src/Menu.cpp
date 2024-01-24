@@ -201,8 +201,42 @@ namespace DX11_Base {
                     }
                 }
             }
+            if (ImGui::Button("test", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
+            {
+
+                g_Console->printdbg("\n\n[+] WorldContextObject: %x [+]\n\n", g_Console->color.green,Config.WorldContextObject);
+
+                if (Config.GetTAllPlayers().IsValid())
+                {
+                    SDK::TArray<SDK::APalPlayerCharacter*> T = Config.GetTAllPlayers();
+                    for (int i =0;i< T.Num();i++)
+                    {
+                        g_Console->printdbg("\n\n[+] APalPlayerCharacter: %x [+]\n\n", g_Console->color.green,T[i]);
+                        if (T[i]->GetPalPlayerController() != NULL)
+                        {
+                            if (T[i]->GetPalPlayerController()->IsLocalController())
+                            {
+                                g_Console->printdbg("\n\n[+] Finded APalPlayerCharacter:[+]\n\n", g_Console->color.green);
+                            }
+                            if (T[i] != NULL)
+                            {
+                                if (T[i]->GetPalPlayerController()->GetPalPlayerState() != NULL)
+                                {
+                                    SDK::FFixedPoint fixpoint = SDK::FFixedPoint();
+                                    fixpoint.Value = 99999999;
+                                    T[i]->ReviveCharacter_ToServer(fixpoint);
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    g_Console->printdbg("\n\n[+]GetTAllPlayers().IsInValid[+]\n\n", g_Console->color.red);
+                }
+            }
             //Creadit WoodgamerHD
-            if (ImGui::Button("Give EXP<Num>", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
+            if(ImGui::Button("Give EXP<Num>", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
             {
                 SDK::APalPlayerCharacter* p_appc = Config.GetPalPlayerCharacter();
                 if (p_appc != NULL)
@@ -225,6 +259,7 @@ namespace DX11_Base {
                 SDK::APalPlayerCharacter* p_appc = Config.GetPalPlayerCharacter();
                 if (p_appc != NULL)
                 {
+
                     if (Config.GetPalPlayerCharacter()->GetPalPlayerController() != NULL)
                     {
                         if (Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState() != NULL)
@@ -256,7 +291,7 @@ namespace DX11_Base {
         void TABConfig()
         {
             ImGui::Text("PalWorld Menu");
-            ImGui::Text("VERSION: v1.0");
+            ImGui::Text("VERSION: v1.1");
 
             ImGui::Spacing();
             ImGui::Separator();
