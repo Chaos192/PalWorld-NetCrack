@@ -6,6 +6,8 @@
 
 SDK::FPalDebugOtomoPalInfo palinfo = SDK::FPalDebugOtomoPalInfo();
 SDK::TArray<SDK::EPalWazaID> EA = { 0U };
+
+
 void AddItem(SDK::UPalPlayerInventoryData* data,char* itemName, int count)
 {
     SDK::UKismetStringLibrary* lib = SDK::UKismetStringLibrary::GetDefaultObj();
@@ -46,7 +48,6 @@ void SpawnPal(char* PalName,int rank, int lvl = 1)
         }
     }
 }
-//Talk: Teleport or Shop anywhere Config.GetPalPlayerCharacter()->GetPalPlayerController()->Transmitter->Character->NotifyTalkStart_ToServer()
 void AnyWhereTP(SDK::FVector& vector,bool IsSafe)
 {
     if (!IsSafe)
@@ -128,7 +129,7 @@ namespace DX11_Base {
     namespace Tabs {
         void TABPlayer()
         {
-
+            
             //�л�����һ��
             ImGui::Checkbox("SpeedHack", &Config.IsSpeedHack);
 
