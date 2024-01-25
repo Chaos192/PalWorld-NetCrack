@@ -5,15 +5,15 @@
 #include "SDK.hpp"
 
 typedef bool(*Tick)(SDK::APalPlayerCharacter* m_this,float DeltaSecond);
-typedef void(*GetAllPlayer)(SDK::UPalCharacterImportanceManager* i_this, SDK::TArray<SDK::APalCharacter*>* OutArray);
+typedef void(*AddStatus)(SDK::UPalNetworkIndividualComponent* p_this, SDK::FPalInstanceID* ID, SDK::TArray<SDK::FPalGotStatusPoint>* AddStatusPointArray);
 
 class config
 {
 public:
 	//offsets
 	DWORD64 ClientBase = 0;
-	DWORD64 offset_Tick = 0x2AB44D0;//APalPlayerCharacter::Tick
-	DWORD64 offset_GetAllPlayers = 0x2962330;// UPalCharacterImportanceManager::GetAllPlayer
+	DWORD64 offset_Tick = 0x2A9E9D0;//APalPlayerCharacter::Tick
+	DWORD64 offset_AddStatus = 0x2B0E960; //UPalNetworkIndividualComponent::AddPlayerCharacterStatusPoint_ToServer
 	//check
 	bool IsESP = false;
 	bool IsAimbot = false;
@@ -28,19 +28,17 @@ public:
 	bool IsMonster = false;
 	bool IsQuick = false;
 	bool matchDbItems = true;
+	bool isEq = false;
 	//def and value
 	float SpeedModiflers = 1.0f;
 	int DamageUp = 0;
 	int DefuseUp = 0;
 	int EXP = 0;
 	int Item = 0;
-	int PalRank = 0;
 	float Pos[3] = {0,0,0};
 	char ItemName[255];
-	char PalName[255];
-	int PalLvL = 1;
-	int PalNum = 1;
 	char inputTextBuffer[255] = "";
+	int EqModifiler = 1;
 	SDK::APalPlayerCharacter* localPlayer = NULL;
 	SDK::TArray<SDK::APalPlayerCharacter*> AllPlayers = {};
 	SDK::UPalCharacterImportanceManager* UCIM = NULL;

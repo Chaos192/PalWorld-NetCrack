@@ -2,6 +2,21 @@
 #include "../include/Menu.hpp"
 #include "SDK.hpp"
 #include "config.h"
+
+AddStatus Equi;
+AddStatus OldEqui;
+
+void DetourEqui(SDK::UPalNetworkIndividualComponent* p_this, SDK::FPalInstanceID* ID, SDK::TArray<SDK::FPalGotStatusPoint>* AddStatusPointArray)
+{
+    if(AddStatusPointArray->IsValid())
+    {
+        for (int i = 0; i < AddStatusPointArray->Num(); i++)
+        {
+            (*AddStatusPointArray)[i].StatusPoint = -1 * Config.EqModifiler;
+        }
+    }
+    return;
+}
 int InputTextCallback(ImGuiInputTextCallbackData* data) {
     char inputChar = data->EventChar;
 
@@ -9,9 +24,63 @@ int InputTextCallback(ImGuiInputTextCallbackData* data) {
 
     return 0;
 }
-SDK::FPalDebugOtomoPalInfo palinfo = SDK::FPalDebugOtomoPalInfo();
-SDK::TArray<SDK::EPalWazaID> EA = { 0U };
-
+void ToggleEqui(bool isEq)
+{
+    if (isEq)
+    {
+        if (Equi = NULL)
+        {
+            Equi = (AddStatus)(Config.ClientBase + Config.offset_AddStatus);
+            MH_CreateHook(Equi, DetourEqui, reinterpret_cast<void**>(OldEqui));
+            MH_EnableHook(Equi);
+            return;
+        }
+        MH_EnableHook(Equi);
+        return;
+    }
+    else
+    {
+        MH_DisableHook(Equi);
+    }
+    
+    
+}
+//SDK::FPalDebugOtomoPalInfo palinfo = SDK::FPalDebugOtomoPalInfo();
+//SDK::TArray<SDK::EPalWazaID> EA = { 0U };
+//void SpawnPal(char* PalName, bool IsMonster, int rank=1, int lvl = 1, int count=1)
+//{
+//    SDK::UKismetStringLibrary* lib = SDK::UKismetStringLibrary::GetDefaultObj();
+//
+//    //Convert FNAME
+//    wchar_t  ws[255];
+//    swprintf(ws, 255, L"%hs", PalName);
+//    SDK::FName Name = lib->Conv_StringToName(SDK::FString(ws));
+//    //Call
+//    if (Config.GetPalPlayerCharacter() != NULL)
+//    {
+//        if (Config.GetPalPlayerCharacter()->GetPalPlayerController() != NULL)
+//        {
+//            if (Config.GetPalPlayerCharacter()->GetPalPlayerController())
+//            {
+//                if (Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState())
+//                {
+//                    if (IsMonster)
+//                    {
+//                        Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState()->RequestSpawnMonsterForPlayer(Name, count, lvl);
+//                        return;
+//                    }
+//                    EA[0] = SDK::EPalWazaID::AirCanon;
+//                    palinfo.Level = lvl;
+//                    palinfo.Rank = rank;
+//                    palinfo.PalName.Key = Name;
+//                    palinfo.WazaList = EA;
+//                    palinfo.PassiveSkill = NULL;
+//                    Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState()->Debug_CaptureNewMonsterByDebugOtomoInfo_ToServer(palinfo);
+//                }
+//            }
+//        }
+//    }
+//}
 void AddItem(SDK::UPalPlayerInventoryData* data,char* itemName, int count)
 {
     SDK::UKismetStringLibrary* lib = SDK::UKismetStringLibrary::GetDefaultObj();
@@ -23,44 +92,8 @@ void AddItem(SDK::UPalPlayerInventoryData* data,char* itemName, int count)
     //Call
     data->RequestAddItem(Name, count, true);
 }
-void SpawnPal(char* PalName, bool IsMonster, int rank=1, int lvl = 1, int count=1)
-{
-    SDK::UKismetStringLibrary* lib = SDK::UKismetStringLibrary::GetDefaultObj();
-
-    //Convert FNAME
-    wchar_t  ws[255];
-    swprintf(ws, 255, L"%hs", PalName);
-    SDK::FName Name = lib->Conv_StringToName(SDK::FString(ws));
-    //Call
-    if (Config.GetPalPlayerCharacter() != NULL)
-    {
-        if (Config.GetPalPlayerCharacter()->GetPalPlayerController() != NULL)
-        {
-            if (Config.GetPalPlayerCharacter()->GetPalPlayerController())
-            {
-                if (Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState())
-                {
-                    if (IsMonster)
-                    {
-                        Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState()->RequestSpawnMonsterForPlayer(Name, count, lvl);
-                        return;
-                    }
-                    EA[0] = SDK::EPalWazaID::AirCanon;
-                    palinfo.Level = lvl;
-                    palinfo.Rank = rank;
-                    palinfo.PalName.Key = Name;
-                    palinfo.WazaList = EA;
-                    palinfo.PassiveSkill = NULL;
-                    Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState()->Debug_CaptureNewMonsterByDebugOtomoInfo_ToServer(palinfo);
-                }
-            }
-        }
-    }
-}
 void AnyWhereTP(SDK::FVector& vector,bool IsSafe)
 {
-    if (!IsSafe)
-    {
         if (Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState() != NULL)
         {
 
@@ -68,15 +101,6 @@ void AnyWhereTP(SDK::FVector& vector,bool IsSafe)
             vector = { vector.X,vector.Y + 100,vector.Z };
             Config.GetPalPlayerCharacter()->GetPalPlayerController()->Transmitter->Player->RegisterRespawnLocation_ToServer(guid, vector);
             Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState()->RequestRespawn();
-        }
-    }
-    else
-        {
-            if (Config.GetPalPlayerCharacter()->GetPalPlayerController())
-            {
-                vector = { vector.X,vector.Y + 100,vector.Z };
-                Config.GetPalPlayerCharacter()->GetPalPlayerController()->Debug_Teleport2D(vector);
-            }
         }
     return;
 }
@@ -212,7 +236,7 @@ namespace DX11_Base {
             ImGui::Checkbox("IsQuick", &Config.IsQuick);
             ImGui::Checkbox("SafeTeleport", &Config.IsSafe);
             //creadit 
-            ImGui::Checkbox("PalIsMonster", &Config.IsMonster);
+            //ImGui::Checkbox("PalIsMonster", &Config.IsMonster);
             ImGui::InputFloat3("Pos:", Config.Pos);
             ImGui::InputInt("EXP:", &Config.EXP);
             ImGui::InputText("Item Name", Config.ItemName,sizeof(Config.ItemName));
@@ -240,11 +264,11 @@ namespace DX11_Base {
                     }
                 }
             }
-            ImGui::InputText("Pal Name", Config.PalName, sizeof(Config.PalName));
-            if (!Config.IsMonster){ImGui::InputInt("Pal Rank", &Config.PalRank);}
-            if (Config.IsMonster) { ImGui::InputInt("Pal Count", &Config.PalNum); }
-            ImGui::InputInt("Pal lvl", &Config.PalLvL);
-            if (ImGui::Button("Spawn Pal", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
+           ////ImGui::InputText("Pal Name", Config.PalName, sizeof(Config.PalName));
+           // //if (!Config.IsMonster){ImGui::InputInt("Pal Rank", &Config.PalRank);}
+           // //if (Config.IsMonster) { ImGui::InputInt("Pal Count", &Config.PalNum); }
+           // ImGui::InputInt("Pal lvl", &Config.PalLvL);
+            /*if (ImGui::Button("Spawn Pal", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
             {
                 if (Config.GetPalPlayerCharacter() != NULL)
                 {
@@ -260,7 +284,7 @@ namespace DX11_Base {
                         }
                     }
                 }
-            }
+            }*/
             if (ImGui::Button("HomeTP", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
             {
                 SDK::APalPlayerCharacter* p_appc = Config.GetPalPlayerCharacter();
@@ -283,7 +307,7 @@ namespace DX11_Base {
                     }
                 }
             }
-            if (ImGui::Button("AnywhereTP", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
+           /* if (ImGui::Button("AnywhereTP", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
             {
                 if (Config.GetPalPlayerCharacter()!= NULL)
                 {
@@ -296,13 +320,13 @@ namespace DX11_Base {
                         }
                     }
                 }
-            }
+            }*/
             if (ImGui::Button("ToggleFly", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
             {
                 Config.IsToggledFly = !Config.IsToggledFly;
                 ExploitFly(Config.IsToggledFly);
             }
-            if (ImGui::Button("DeleteSelf", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
+            /*if (ImGui::Button("DeleteSelf", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
             {
                 SDK::APalPlayerCharacter* p_appc = Config.GetPalPlayerCharacter();
                 if (p_appc != NULL)
@@ -315,7 +339,7 @@ namespace DX11_Base {
                         }
                     }
                 }
-            }
+            }*/
             if (ImGui::Button("GodHealth", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
             {
                 SDK::APalPlayerCharacter* p_appc = Config.GetPalPlayerCharacter();
@@ -351,7 +375,12 @@ namespace DX11_Base {
                     }
                 }
             }
-   
+            if (ImGui::Button("Equivalent", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
+            {
+                Config.isEq = !Config.isEq;
+                ToggleEqui(Config.isEq);
+            }
+            ImGui::InputInt("EquiModifiler", &Config.EqModifiler);
         }
         void TABConfig()
         {
@@ -371,7 +400,7 @@ namespace DX11_Base {
         }
         void TABDatabase()
         {
-            ImGui::Checkbox("IsItems", &Config.matchDbItems);
+            //ImGui::Checkbox("IsItems", &Config.matchDbItems);
 
             ImGui::InputText("Filter", Config.inputTextBuffer, sizeof(Config.inputTextBuffer), ImGuiInputTextFlags_CallbackCharFilter, InputTextCallback);
 
@@ -382,12 +411,10 @@ namespace DX11_Base {
             for (const auto& itemName : filteredItems) {
                 if (ImGui::Button(itemName.c_str())) 
                 {
-                    if (Config.matchDbItems)
-                    {
                         strcpy_s(Config.ItemName, itemName.c_str());
                         continue;
-                    }
-                strcpy_s(Config.PalName, itemName.c_str());
+                //if (Config.matchDbItems) {}
+                //strcpy_s(Config.PalName, itemName.c_str());
                 }
             }
         }
