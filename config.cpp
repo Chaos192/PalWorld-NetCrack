@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "config.h"
+#include <algorithm>
 
 config Config;
 
@@ -8,7 +9,18 @@ Tick OldTickFunc;
 
 GetAllPlayer GetAllPlayerFunc;
 GetAllPlayer OldGetAllPlayerFunc;
+void config::Update(const char* filterText)
+{
+    Config.db_filteredItems.clear();
 
+    for (const auto& itemName : database::db_items) {
+        if (strstr(itemName.c_str(), filterText) != nullptr) {
+            Config.db_filteredItems.push_back(itemName);
+        }
+    }
+    std::sort(Config.db_filteredItems.begin(), Config.db_filteredItems.end());
+}
+const std::vector<std::string>& config::GetFilteredItems(){ return Config.db_filteredItems; }
 void DetourPlayers(SDK::UPalCharacterImportanceManager* i_this, SDK::TArray<SDK::APalCharacter*>* OutArray)
 {
     Config.UCIM = i_this;
@@ -69,4 +81,6 @@ void config::Init()
 
     MH_CreateHook(TickFunc, DetourTick, reinterpret_cast<void**>(&OldTickFunc));
     MH_CreateHook(GetAllPlayerFunc, DetourPlayers, reinterpret_cast<void**>(&OldGetAllPlayerFunc));
+    //init database
+    ZeroMemory(&Config.db_filteredItems, sizeof(Config.db_filteredItems));
 }

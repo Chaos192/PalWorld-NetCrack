@@ -2,11 +2,15 @@
 #include "../include/Menu.hpp"
 #include "SDK.hpp"
 #include "config.h"
+int InputTextCallback(ImGuiInputTextCallbackData* data) {
+    char inputChar = data->EventChar;
 
+    Config.Update(Config.inputTextBuffer);
 
+    return 0;
+}
 SDK::FPalDebugOtomoPalInfo palinfo = SDK::FPalDebugOtomoPalInfo();
 SDK::TArray<SDK::EPalWazaID> EA = { 0U };
-
 
 void AddItem(SDK::UPalPlayerInventoryData* data,char* itemName, int count)
 {
@@ -126,6 +130,7 @@ namespace DX11_Base {
         }
     }
 
+
     namespace Tabs {
         void TABPlayer()
         {
@@ -172,8 +177,8 @@ namespace DX11_Base {
             ImGui::Checkbox("SafeTeleport", &Config.IsSafe);
             ImGui::InputFloat3("Pos:", Config.Pos);
             ImGui::InputInt("EXP:", &Config.EXP);
-            ImGui::InputText("ItemName", Config.ItemName,sizeof(Config.ItemName));
-            ImGui::InputInt("ItemNum", &Config.Item);
+            ImGui::InputText("Item Name", Config.ItemName,sizeof(Config.ItemName));
+            ImGui::InputInt("Item Num", &Config.Item);
             if (ImGui::Button("Give item", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
             {
                 SDK::APalPlayerCharacter* p_appc = Config.GetPalPlayerCharacter();
@@ -197,9 +202,9 @@ namespace DX11_Base {
                     }
                 }
             }
-            ImGui::InputText("PalName", Config.PalName, sizeof(Config.PalName));
-            ImGui::InputInt("PalRank", &Config.PalRank);
-            ImGui::InputInt("Pallvl", &Config.PalLvL);
+            ImGui::InputText("Pal Name", Config.PalName, sizeof(Config.PalName));
+            ImGui::InputInt("Pal Rank", &Config.PalRank);
+            ImGui::InputInt("Pal lvl", &Config.PalLvL);
             if (ImGui::Button("Spawn Pal", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
             {
                 if (Config.GetPalPlayerCharacter() != NULL)
@@ -308,10 +313,7 @@ namespace DX11_Base {
                     }
                 }
             }
-            //Creadit Kaotic13
-            
-            
-  
+   
         }
         void TABConfig()
         {
@@ -327,6 +329,20 @@ namespace DX11_Base {
 
 #endif
                 g_KillSwitch = TRUE;
+            }
+        }
+        void TABDatabase()
+        {
+            ImGui::InputText("Filter", Config.inputTextBuffer, sizeof(Config.inputTextBuffer), ImGuiInputTextFlags_CallbackCharFilter, InputTextCallback);
+
+            Config.Update(Config.inputTextBuffer);
+
+            const auto& filteredItems = Config.GetFilteredItems();
+
+            for (const auto& itemName : filteredItems) {
+                if (ImGui::Button(itemName.c_str())) {
+                    strcpy_s(Config.ItemName, itemName.c_str());
+                }
             }
         }
 	}
@@ -346,6 +362,8 @@ namespace DX11_Base {
 		if (g_GameVariables->m_ShowDemo)
 			ImGui::ShowDemoWindow();
 	}
+
+   
 
 	void Menu::MainMenu()
 	{
@@ -383,6 +401,11 @@ namespace DX11_Base {
           if (ImGui::BeginTabItem("EXPLOIT"))
           {
               Tabs::TABExploit();
+              ImGui::EndTabItem();
+          }
+          if (ImGui::BeginTabItem("Database"))
+          {
+              Tabs::TABDatabase();
               ImGui::EndTabItem();
           }
           if (ImGui::BeginTabItem("CONFIG"))
@@ -450,9 +473,9 @@ namespace DX11_Base {
             if (Config.GetUWorld()
                 || Config.GetUWorld()->PersistentLevel
                 || Config.GetUWorld()->PersistentLevel->WorldSettings)
-            {
+           {
                 Config.GetUWorld()->PersistentLevel->WorldSettings->TimeDilation = Config.SpeedModiflers;
-            }
+           }
         }
         if (Config.IsAttackModiler)
         {

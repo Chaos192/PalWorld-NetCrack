@@ -162,6 +162,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="config.h" />
+    <ClInclude Include="database.h" />
     <ClInclude Include="feature.h" />
     <ClInclude Include="include\Console.hpp" />
     <ClInclude Include="include\D3D11Window.hpp" />
