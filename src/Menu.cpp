@@ -182,7 +182,7 @@ namespace DX11_Base {
             //Creadit Mokobake
             //ImGui::Checkbox("MuteKiGodmode", &Config.IsMuteki);
 
-            if (ImGui::Button("ToggleInfAmmo",ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
+            if (ImGui::Button("ToggleInfAmmo",ImVec2(ImGui::GetContentRegionAvail().x - 3, 20)))
             {
                 if (Config.GetPalPlayerCharacter()->ShooterComponent != NULL && Config.GetPalPlayerCharacter()->ShooterComponent->CanShoot())
                 {
@@ -197,7 +197,7 @@ namespace DX11_Base {
             ImGui::SliderInt("AttackModifilers", &Config.DamageUp, 0, 200000);
             ImGui::SliderInt("defenseModifilers", &Config.DefuseUp, 0, 200000);
             
-            if (ImGui::Button("PrintPlayerAddr", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
+            if (ImGui::Button("PrintPlayerAddr", ImVec2(ImGui::GetContentRegionAvail().x - 3, 20)))
             {
                 SDK::APalPlayerCharacter* p_appc = Config.GetPalPlayerCharacter();
                 if (p_appc != NULL)
@@ -217,7 +217,7 @@ namespace DX11_Base {
             ImGui::InputInt("EXP:", &Config.EXP);
             ImGui::InputText("Item Name", Config.ItemName,sizeof(Config.ItemName));
             ImGui::InputInt("Item Num", &Config.Item);
-            if (ImGui::Button("Give item", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
+            if (ImGui::Button("Give item", ImVec2(ImGui::GetContentRegionAvail().x - 3, 20)))
             {
                 SDK::APalPlayerCharacter* p_appc = Config.GetPalPlayerCharacter();
                 if (p_appc != NULL)
@@ -244,7 +244,7 @@ namespace DX11_Base {
             if (!Config.IsMonster){ImGui::InputInt("Pal Rank", &Config.PalRank);}
             if (Config.IsMonster) { ImGui::InputInt("Pal Count", &Config.PalNum); }
             ImGui::InputInt("Pal lvl", &Config.PalLvL);
-            if (ImGui::Button("Spawn Pal", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
+            if (ImGui::Button("Spawn Pal", ImVec2(ImGui::GetContentRegionAvail().x - 3, 20)))
             {
                 if (Config.GetPalPlayerCharacter() != NULL)
                 {
@@ -261,7 +261,7 @@ namespace DX11_Base {
                     }
                 }
             }
-            if (ImGui::Button("HomeTP", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
+            if (ImGui::Button("HomeTP", ImVec2(ImGui::GetContentRegionAvail().x - 3, 20)))
             {
                 SDK::APalPlayerCharacter* p_appc = Config.GetPalPlayerCharacter();
                 if (p_appc != NULL)
@@ -283,7 +283,7 @@ namespace DX11_Base {
                     }
                 }
             }
-            if (ImGui::Button("AnywhereTP", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
+            if (ImGui::Button("AnywhereTP", ImVec2(ImGui::GetContentRegionAvail().x - 3, 20)))
             {
                 if (Config.GetPalPlayerCharacter()!= NULL)
                 {
@@ -297,12 +297,12 @@ namespace DX11_Base {
                     }
                 }
             }
-            if (ImGui::Button("ToggleFly", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
+            if (ImGui::Button("ToggleFly", ImVec2(ImGui::GetContentRegionAvail().x - 3, 20)))
             {
                 Config.IsToggledFly = !Config.IsToggledFly;
                 ExploitFly(Config.IsToggledFly);
             }
-            if (ImGui::Button("DeleteSelf", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
+            if (ImGui::Button("DeleteSelf", ImVec2(ImGui::GetContentRegionAvail().x - 3, 20)))
             {
                 SDK::APalPlayerCharacter* p_appc = Config.GetPalPlayerCharacter();
                 if (p_appc != NULL)
@@ -316,7 +316,7 @@ namespace DX11_Base {
                     }
                 }
             }
-            if (ImGui::Button("GodHealth", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
+            if (ImGui::Button("GodHealth", ImVec2(ImGui::GetContentRegionAvail().x - 3, 20)))
             {
                 SDK::APalPlayerCharacter* p_appc = Config.GetPalPlayerCharacter();
                 if (p_appc != NULL)
@@ -334,7 +334,7 @@ namespace DX11_Base {
                 }
             }
             //Creadit WoodgamerHD
-            if(ImGui::Button("Give exp", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
+            if(ImGui::Button("Give exp", ImVec2(ImGui::GetContentRegionAvail().x - 3, 20)))
             {
                 SDK::APalPlayerCharacter* p_appc = Config.GetPalPlayerCharacter();
                 if (p_appc != NULL)
@@ -361,7 +361,7 @@ namespace DX11_Base {
             ImGui::Spacing();
             ImGui::Separator();
             ImGui::Spacing();
-            if (ImGui::Button("UNHOOK DLL", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20))) {
+            if (ImGui::Button("UNHOOK DLL", ImVec2(ImGui::GetContentRegionAvail().x - 3, 20))) {
 #if DEBUG
                 g_Console->printdbg("\n\n[+] UNHOOK INITIALIZED [+]\n\n", g_Console->color.red);
 
@@ -393,19 +393,19 @@ namespace DX11_Base {
         }
         void TABQuick()//Creadit:asashi
         {
-                if (ImGui::Button("Basic Items stack", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20))) {
+                if (ImGui::Button("Basic Items stack", ImVec2(ImGui::GetContentRegionAvail().x - 3, 20))) {
                     Spawn_Multiple(config::QuickItemSet::basic_items_stackable);
                 }
-                if (ImGui::Button("Basic Items single", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20))) {
+                if (ImGui::Button("Basic Items single", ImVec2(ImGui::GetContentRegionAvail().x - 3, 20))) {
                     Spawn_Multiple(config::QuickItemSet::basic_items_single);
                 }
-                if (ImGui::Button("Unlock Pal skills", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20))) {
+                if (ImGui::Button("Unlock Pal skills", ImVec2(ImGui::GetContentRegionAvail().x - 3, 20))) {
                     Spawn_Multiple(config::QuickItemSet::pal_unlock_skills);
                 }
-                if (ImGui::Button("Spheres", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20))) {
+                if (ImGui::Button("Spheres", ImVec2(ImGui::GetContentRegionAvail().x - 3, 20))) {
                     Spawn_Multiple(config::QuickItemSet::spheres);
                 }
-                if (ImGui::Button("Tools", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20))) {
+                if (ImGui::Button("Tools", ImVec2(ImGui::GetContentRegionAvail().x - 3, 20))) {
                     Spawn_Multiple(config::QuickItemSet::tools);
                 }
         }
