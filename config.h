@@ -25,6 +25,9 @@ public:
 	bool IsInfinAmmo = false;
 	bool IsToggledFly = false;
 	bool IsMuteki = false;
+	bool IsMonster = false;
+	bool IsQuick = false;
+	bool matchDbItems = true;
 	//def and value
 	float SpeedModiflers = 1.0f;
 	int DamageUp = 0;
@@ -36,15 +39,22 @@ public:
 	char ItemName[255];
 	char PalName[255];
 	int PalLvL = 1;
+	int PalNum = 1;
 	char inputTextBuffer[255] = "";
 	SDK::APalPlayerCharacter* localPlayer = NULL;
 	SDK::TArray<SDK::APalPlayerCharacter*> AllPlayers = {};
 	SDK::UPalCharacterImportanceManager* UCIM = NULL;
 	SDK::UObject* WorldContextObject = NULL;
 
-	//Items
-	
+	enum QuickItemSet
+	{
+		basic_items_stackable,
+	    basic_items_single,
+		pal_unlock_skills,
+		spheres,
+		tools
 
+	};
 	//Filtered Items
 	std::vector<std::string> db_filteredItems;
 

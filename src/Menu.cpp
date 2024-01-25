@@ -23,7 +23,7 @@ void AddItem(SDK::UPalPlayerInventoryData* data,char* itemName, int count)
     //Call
     data->RequestAddItem(Name, count, true);
 }
-void SpawnPal(char* PalName,int rank, int lvl = 1)
+void SpawnPal(char* PalName, bool IsMonster, int rank=1, int lvl = 1, int count=1)
 {
     SDK::UKismetStringLibrary* lib = SDK::UKismetStringLibrary::GetDefaultObj();
 
@@ -40,6 +40,11 @@ void SpawnPal(char* PalName,int rank, int lvl = 1)
             {
                 if (Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState())
                 {
+                    if (IsMonster)
+                    {
+                        Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState()->RequestSpawnMonsterForPlayer(Name, count, lvl);
+                        return;
+                    }
                     EA[0] = SDK::EPalWazaID::AirCanon;
                     palinfo.Level = lvl;
                     palinfo.Rank = rank;
@@ -98,6 +103,36 @@ void ExploitFly(bool IsFly)
     }
     return;
 }
+void Spawn_Multiple(config::QuickItemSet Set)
+{
+        SDK::UPalPlayerInventoryData * InventoryData = Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState()->GetInventoryData();
+        switch (Set)
+        {
+        case 0:
+            for (int i = 0; i < IM_ARRAYSIZE(database::basic_items_stackable); i++) {
+                AddItem(InventoryData, _strdup(database::basic_items_stackable[i].c_str()), 100);
+            }
+        case 1:
+            for (int i = 0; i < IM_ARRAYSIZE(database::basic_items_single); i++) 
+             {
+                    AddItem(InventoryData, _strdup(database::basic_items_single[i].c_str()), 1);
+             }
+        case 2:
+            for (int i = 0; i < IM_ARRAYSIZE(database::pal_unlock_skills); i++) {
+                AddItem(InventoryData, _strdup(database::pal_unlock_skills[i].c_str()), 1);
+            }
+        case 3:
+            for (int i = 0; i < IM_ARRAYSIZE(database::spheres); i++) {
+                AddItem(InventoryData, _strdup(database::spheres[i].c_str()), 100);
+            }
+        case 4:
+            for (int i = 0; i < IM_ARRAYSIZE(database::tools); i++) {
+                AddItem(InventoryData, _strdup(database::tools[i].c_str()), 1);
+            }
+        default:
+            break;
+        }
+}//Creadit:asashi
 
 namespace DX11_Base {
 
@@ -174,7 +209,10 @@ namespace DX11_Base {
         void TABExploit()
         {
             //Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState()->RequestSpawnMonsterForPlayer(name, 5, 1);
+            ImGui::Checkbox("IsQuick", &Config.IsQuick);
             ImGui::Checkbox("SafeTeleport", &Config.IsSafe);
+            //creadit 
+            ImGui::Checkbox("PalIsMonster", &Config.IsMonster);
             ImGui::InputFloat3("Pos:", Config.Pos);
             ImGui::InputInt("EXP:", &Config.EXP);
             ImGui::InputText("Item Name", Config.ItemName,sizeof(Config.ItemName));
@@ -203,7 +241,8 @@ namespace DX11_Base {
                 }
             }
             ImGui::InputText("Pal Name", Config.PalName, sizeof(Config.PalName));
-            ImGui::InputInt("Pal Rank", &Config.PalRank);
+            if (!Config.IsMonster){ImGui::InputInt("Pal Rank", &Config.PalRank);}
+            if (Config.IsMonster) { ImGui::InputInt("Pal Count", &Config.PalNum); }
             ImGui::InputInt("Pal lvl", &Config.PalLvL);
             if (ImGui::Button("Spawn Pal", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
             {
@@ -216,7 +255,7 @@ namespace DX11_Base {
                             if (Config.PalName != NULL)
                             {
                                 g_Console->printdbg("\n\n[+] PalName: %s [+]\n\n", g_Console->color.green, Config.ItemName);
-                                SpawnPal(Config.PalName,Config.PalRank,Config.PalLvL);
+                                SpawnPal(Config.PalName,Config.IsMonster,Config.PalRank,Config.PalLvL,Config.PalNum);
                             }
                         }
                     }
@@ -294,7 +333,6 @@ namespace DX11_Base {
                     }
                 }
             }
-           
             //Creadit WoodgamerHD
             if(ImGui::Button("Give exp", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
             {
@@ -333,6 +371,8 @@ namespace DX11_Base {
         }
         void TABDatabase()
         {
+            ImGui::Checkbox("IsItems", &Config.matchDbItems);
+
             ImGui::InputText("Filter", Config.inputTextBuffer, sizeof(Config.inputTextBuffer), ImGuiInputTextFlags_CallbackCharFilter, InputTextCallback);
 
             Config.Update(Config.inputTextBuffer);
@@ -340,10 +380,34 @@ namespace DX11_Base {
             const auto& filteredItems = Config.GetFilteredItems();
 
             for (const auto& itemName : filteredItems) {
-                if (ImGui::Button(itemName.c_str())) {
-                    strcpy_s(Config.ItemName, itemName.c_str());
+                if (ImGui::Button(itemName.c_str())) 
+                {
+                    if (Config.matchDbItems)
+                    {
+                        strcpy_s(Config.ItemName, itemName.c_str());
+                        continue;
+                    }
+                strcpy_s(Config.PalName, itemName.c_str());
                 }
             }
+        }
+        void TABQuick()//Creadit:asashi
+        {
+                if (ImGui::Button("Basic Items stack", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20))) {
+                    Spawn_Multiple(config::QuickItemSet::basic_items_stackable);
+                }
+                if (ImGui::Button("Basic Items single", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20))) {
+                    Spawn_Multiple(config::QuickItemSet::basic_items_single);
+                }
+                if (ImGui::Button("Unlock Pal skills", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20))) {
+                    Spawn_Multiple(config::QuickItemSet::pal_unlock_skills);
+                }
+                if (ImGui::Button("Spheres", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20))) {
+                    Spawn_Multiple(config::QuickItemSet::spheres);
+                }
+                if (ImGui::Button("Tools", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20))) {
+                    Spawn_Multiple(config::QuickItemSet::tools);
+                }
         }
 	}
 
@@ -413,7 +477,11 @@ namespace DX11_Base {
               Tabs::TABConfig();
               ImGui::EndTabItem();
           }
-         
+          if (Config.IsQuick && ImGui::BeginTabItem("Quick"))
+          {
+              Tabs::TABQuick();
+              ImGui::EndTabItem();
+          }
            ImGui::EndTabBar();
         }
         ImGui::End();

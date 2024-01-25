@@ -13,7 +13,9 @@ void config::Update(const char* filterText)
 {
     Config.db_filteredItems.clear();
 
-    for (const auto& itemName : database::db_items) {
+    const auto& itemsToSearch = Config.matchDbItems ? database::db_items : database::db_pals;
+
+    for (const auto& itemName : itemsToSearch) {
         if (strstr(itemName.c_str(), filterText) != nullptr) {
             Config.db_filteredItems.push_back(itemName);
         }
