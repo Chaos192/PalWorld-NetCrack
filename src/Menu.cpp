@@ -279,7 +279,7 @@ namespace DX11_Base {
                                 SDK::UPalItemContainerMultiHelper* InventoryMultiHelper = InventoryData->InventoryMultiHelper;
                                 if (InventoryMultiHelper != NULL) {
                                     SDK::TArray<class SDK::UPalItemContainer*> Containers = InventoryMultiHelper->Containers;
-                                    if (Containers.Num() == 0) {
+                                    if (Containers.Count() == 0) {
                                         return;
                                     }
 

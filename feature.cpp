@@ -75,7 +75,7 @@ void SetInfiniteAmmo(bool bInfAmmo)
 
 }
 
-void SetCraftingSpeed(float mNewSpeed, bool bRestoreDefault = false)
+void SetCraftingSpeed(float mNewSpeed, bool bRestoreDefault)
 {
 	APalPlayerCharacter* pPalCharacter = Config.GetPalPlayerCharacter();
 	if (!pPalCharacter)

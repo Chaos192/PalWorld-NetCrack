@@ -41,16 +41,16 @@ SDK::UWorld* config::GetUWorld()
         auto gworld = signature("48 8B 05 ? ? ? ? EB 05").instruction(3).add(7);
         gworld_ptr = gworld.GetPointer();
         if (gworld_ptr)
-            gWorld = *(SDK::UWorld**)gworld_ptr;
+            Config.gWorld = *(SDK::UWorld**)gworld_ptr;
     }
     return (*(SDK::UWorld**)(gworld_ptr));
 }
 
-SDK::UPalCharacterImportanceManager* GetCharacterImpManager()
+SDK::UPalCharacterImportanceManager* config::GetCharacterImpManager()
 {
-    SDK::UWorld* pWorld = config::gWorld;
+    SDK::UWorld* pWorld = Config.gWorld;
     if (!pWorld)
-        return;
+        return nullptr;
 
     SDK::UGameInstance* pGameInstance = pWorld->OwningGameInstance; 
     if (!pGameInstance) 
@@ -80,7 +80,7 @@ SDK::APalPlayerState* config::GetPalPlayerState()
 
 bool GetTAllPlayers(SDK::TArray<class SDK::APalCharacter*>* outResult)
 {
-    SDK::UPalCharacterImportanceManager* mPal = GetCharacterImpManager();
+    SDK::UPalCharacterImportanceManager* mPal = config::GetCharacterImpManager();
     if (!mPal)
         return false;
 
@@ -90,7 +90,7 @@ bool GetTAllPlayers(SDK::TArray<class SDK::APalCharacter*>* outResult)
 
 bool GetTAllImpNPC(SDK::TArray<class SDK::APalCharacter*>* outResult)
 {
-    SDK::UPalCharacterImportanceManager* mPal = GetCharacterImpManager();
+    SDK::UPalCharacterImportanceManager* mPal = config::GetCharacterImpManager();
     if (!mPal)
         return false;
 
@@ -100,7 +100,7 @@ bool GetTAllImpNPC(SDK::TArray<class SDK::APalCharacter*>* outResult)
 
 bool GetTAllNPC(SDK::TArray<class SDK::APalCharacter*>* outResult)
 {
-    SDK::UPalCharacterImportanceManager* mPal = GetCharacterImpManager();
+    SDK::UPalCharacterImportanceManager* mPal = config::GetCharacterImpManager();
     if (!mPal)
         return false;
 
@@ -110,7 +110,7 @@ bool GetTAllNPC(SDK::TArray<class SDK::APalCharacter*>* outResult)
 
 bool GetTAllPals(SDK::TArray<class SDK::APalCharacter*>* outResult)
 {
-    SDK::UPalCharacterImportanceManager* mPal = GetCharacterImpManager();
+    SDK::UPalCharacterImportanceManager* mPal = config::GetCharacterImpManager();
     if (!mPal)
         return false;
 

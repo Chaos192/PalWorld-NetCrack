@@ -39,7 +39,7 @@ public:
 	char ItemName[255];
 	char inputTextBuffer[255] = "";
 	int EqModifiler = 1;
-	static SDK::UWorld* gWorld;
+	SDK::UWorld* gWorld = nullptr;
 	SDK::APalPlayerCharacter* localPlayer = NULL;
 	SDK::TArray<SDK::APalPlayerCharacter*> AllPlayers = {};
 	SDK::UPalCharacterImportanceManager* UCIM = NULL;
