@@ -39,6 +39,7 @@ public:
 	char ItemName[255];
 	char inputTextBuffer[255] = "";
 	int EqModifiler = 1;
+	static SDK::UWorld* gWorld;
 	SDK::APalPlayerCharacter* localPlayer = NULL;
 	SDK::TArray<SDK::APalPlayerCharacter*> AllPlayers = {};
 	SDK::UPalCharacterImportanceManager* UCIM = NULL;
@@ -58,8 +59,14 @@ public:
 
 	//static function
 	static SDK::UWorld* GetUWorld();
+	static SDK::UPalCharacterImportanceManager* GetCharacterImpManager();
 	static SDK::APalPlayerCharacter* GetPalPlayerCharacter();
+	static SDK::APalPlayerState* GetPalPlayerState();
 	static SDK::TArray<SDK::APalPlayerCharacter*> GetTAllPlayers();
+	static bool	GetTAllPlayers(SDK::TArray<class SDK::APalCharacter*>* outResult);
+	static bool	GetTAllImpNPC(SDK::TArray<class SDK::APalCharacter*>* outResult);
+	static bool	GetTAllNPC(SDK::TArray<class SDK::APalCharacter*>* outResult);
+	static bool	GetTAllPals(SDK::TArray<class SDK::APalCharacter*>* outResult);
 	static void Init();
 	static void Update(const char* filterText);
 	static const std::vector<std::string>& GetFilteredItems();

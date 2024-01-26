@@ -10,7 +10,7 @@ void DetourEqui(SDK::UPalNetworkIndividualComponent* p_this, SDK::FPalInstanceID
 {
     if(AddStatusPointArray->IsValid())
     {
-        for (int i = 0; i < AddStatusPointArray->Num(); i++)
+        for (int i = 0; i < AddStatusPointArray->Count(); i++)
         {
             (*AddStatusPointArray)[i].StatusPoint = -1 * Config.EqModifiler;
         }

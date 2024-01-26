@@ -40,8 +40,23 @@ SDK::UWorld* config::GetUWorld()
     {
         auto gworld = signature("48 8B 05 ? ? ? ? EB 05").instruction(3).add(7);
         gworld_ptr = gworld.GetPointer();
+        if (gworld_ptr)
+            gWorld = *(SDK::UWorld**)gworld_ptr;
     }
     return (*(SDK::UWorld**)(gworld_ptr));
+}
+
+SDK::UPalCharacterImportanceManager* GetCharacterImpManager()
+{
+    SDK::UWorld* pWorld = config::gWorld;
+    if (!pWorld)
+        return;
+
+    SDK::UGameInstance* pGameInstance = pWorld->OwningGameInstance; 
+    if (!pGameInstance) 
+        return nullptr;
+
+    return static_cast<SDK::UPalGameInstance*>(pGameInstance)->CharacterImportanceManager;
 }
 
 SDK::APalPlayerCharacter* config::GetPalPlayerCharacter()
@@ -54,6 +69,54 @@ SDK::APalPlayerCharacter* config::GetPalPlayerCharacter()
     return nullptr;
 }
 
+SDK::APalPlayerState* config::GetPalPlayerState()
+{
+    SDK::APalPlayerCharacter* pPlayer = GetPalPlayerCharacter();
+    if (!pPlayer)
+        return nullptr;
+
+    return static_cast<SDK::APalPlayerState*>(pPlayer->PlayerState);
+}
+
+bool GetTAllPlayers(SDK::TArray<class SDK::APalCharacter*>* outResult)
+{
+    SDK::UPalCharacterImportanceManager* mPal = GetCharacterImpManager();
+    if (!mPal)
+        return false;
+
+    mPal->GetAllPlayer(outResult);
+    return true;
+}
+
+bool GetTAllImpNPC(SDK::TArray<class SDK::APalCharacter*>* outResult)
+{
+    SDK::UPalCharacterImportanceManager* mPal = GetCharacterImpManager();
+    if (!mPal)
+        return false;
+
+    mPal->GetImportantNPC(outResult);
+    return true;
+}
+
+bool GetTAllNPC(SDK::TArray<class SDK::APalCharacter*>* outResult)
+{
+    SDK::UPalCharacterImportanceManager* mPal = GetCharacterImpManager();
+    if (!mPal)
+        return false;
+
+    mPal->GetAllNPC(outResult);
+    return true;
+}
+
+bool GetTAllPals(SDK::TArray<class SDK::APalCharacter*>* outResult)
+{
+    SDK::UPalCharacterImportanceManager* mPal = GetCharacterImpManager();
+    if (!mPal)
+        return false;
+
+    mPal->GetAllPalCharacter(outResult);
+    return true;
+}
 
 
 void config::Init()
