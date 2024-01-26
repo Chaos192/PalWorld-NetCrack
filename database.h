@@ -824,7 +824,7 @@ namespace database
      "FriedKelpie",
      "Chowder",
     };
-    static std::vector<std::string> db_pals = 
+    /*static std::vector<std::string> db_pals = 
     {
     "Alpaca",
     "AmaterasuWolf",
@@ -992,7 +992,7 @@ namespace database
     "DessertBoss",
     "VolcanoBoss",
     "SnowBoss",
-    };
+    };*/
     static std::string basic_items_stackable[15] =
     {
         "Wood",

@@ -7,13 +7,11 @@ config Config;
 Tick TickFunc;
 Tick OldTickFunc;
 
-GetAllPlayer GetAllPlayerFunc;
-GetAllPlayer OldGetAllPlayerFunc;
 void config::Update(const char* filterText)
 {
     Config.db_filteredItems.clear();
 
-    const auto& itemsToSearch = Config.matchDbItems ? database::db_items : database::db_pals;
+    const auto& itemsToSearch = database::db_items;
 
     for (const auto& itemName : itemsToSearch) {
         if (strstr(itemName.c_str(), filterText) != nullptr) {
@@ -23,15 +21,7 @@ void config::Update(const char* filterText)
     std::sort(Config.db_filteredItems.begin(), Config.db_filteredItems.end());
 }
 const std::vector<std::string>& config::GetFilteredItems(){ return Config.db_filteredItems; }
-void DetourPlayers(SDK::UPalCharacterImportanceManager* i_this, SDK::TArray<SDK::APalCharacter*>* OutArray)
-{
-    Config.UCIM = i_this;
-    if(i_this->PlayerList.IsValid())
-    {
-        Config.AllPlayers = i_this->PlayerList_ForOutsideGet;
-    }
-    return OldGetAllPlayerFunc(i_this, OutArray);
-}
+
 bool DetourTick(SDK::APalPlayerCharacter* m_this,float DeltaSecond)
 {
     if (m_this->GetPalPlayerController() != NULL)
@@ -64,14 +54,7 @@ SDK::APalPlayerCharacter* config::GetPalPlayerCharacter()
     return nullptr;
 }
 
-SDK::TArray<SDK::APalPlayerCharacter*> config::GetTAllPlayers()
-{
-    if (Config.AllPlayers.IsValid())
-    {
-        return Config.AllPlayers;
-    }
-    return NULL;
-}
+
 
 void config::Init()
 {
@@ -79,10 +62,9 @@ void config::Init()
     Config.ClientBase = (DWORD64)GetModuleHandleA("PalWorld-Win64-Shipping.exe");
     
     TickFunc = (Tick)(Config.ClientBase + Config.offset_Tick);
-    GetAllPlayerFunc = (GetAllPlayer)(Config.ClientBase + Config.offset_GetAllPlayers);
 
     MH_CreateHook(TickFunc, DetourTick, reinterpret_cast<void**>(&OldTickFunc));
-    MH_CreateHook(GetAllPlayerFunc, DetourPlayers, reinterpret_cast<void**>(&OldGetAllPlayerFunc));
+
     //init database
     ZeroMemory(&Config.db_filteredItems, sizeof(Config.db_filteredItems));
 }
