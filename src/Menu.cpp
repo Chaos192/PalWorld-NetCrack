@@ -264,6 +264,72 @@ namespace DX11_Base {
                     }
                 }
             }
+
+            if (ImGui::Button("Give x2 first item", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
+            {
+                SDK::APalPlayerCharacter* p_appc = Config.GetPalPlayerCharacter();
+                if (p_appc != NULL)
+                {
+                    if (Config.GetPalPlayerCharacter()->GetPalPlayerController() != NULL)
+                    {
+                        if (Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState() != NULL)
+                        {
+                            SDK::UPalPlayerInventoryData* InventoryData = Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState()->GetInventoryData();
+                            if (InventoryData != NULL) {
+                                SDK::UPalItemContainerMultiHelper* InventoryMultiHelper = InventoryData->InventoryMultiHelper;
+                                if (InventoryMultiHelper != NULL) {
+                                    SDK::TArray<class SDK::UPalItemContainer*> Containers = InventoryMultiHelper->Containers;
+                                    if (Containers.Num() == 0) {
+                                        return;
+                                    }
+
+                                    SDK::UPalItemSlot* FirstSlot = Containers[0]->Get(0);
+
+                                    if (FirstSlot != NULL)
+                                    {
+                                        SDK::FPalItemId FirstItemId = FirstSlot->GetItemId();
+                                        int32 StackCount = FirstSlot->GetStackCount();
+                                        InventoryData->RequestAddItem(FirstItemId.StaticId, StackCount * 2, true);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (ImGui::Button("All Effigies", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
+            {
+                SDK::APalPlayerCharacter* pPalCharacter = Config.GetPalPlayerCharacter();
+                if (!pPalCharacter)
+                    return;
+
+                SDK::UWorld* world = Config.GetUWorld();
+                if (!world)
+                    return;
+
+                SDK::TUObjectArray* objects = world->GObjects;
+
+                for (int i = 0; i < objects->NumElements; ++i) {
+                    SDK::UObject* object = objects->GetByIndex(i);
+
+                    if (!object) {
+                        continue;
+                    }
+
+                    if (!object->IsA(SDK::APalLevelObjectRelic::StaticClass())) {
+                        continue;
+                    }
+
+                    SDK::APalLevelObjectObtainable* relic = (SDK::APalLevelObjectObtainable*)object;
+                    if (!relic) {
+                        continue;
+                    }
+
+                    ((SDK::APalPlayerState*)pPalCharacter->PlayerState)->RequestObtainLevelObject_ToServer(relic);
+                }
+            }
+
            ////ImGui::InputText("Pal Name", Config.PalName, sizeof(Config.PalName));
            // //if (!Config.IsMonster){ImGui::InputInt("Pal Rank", &Config.PalRank);}
            // //if (Config.IsMonster) { ImGui::InputInt("Pal Count", &Config.PalNum); }
