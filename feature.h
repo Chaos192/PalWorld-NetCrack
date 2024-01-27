@@ -9,7 +9,9 @@ void ESP_DEBUG(double mDist, SDK::UClass* mEntType = SDK::AActor::StaticClass())
 
 void DrawUActorComponent(SDK::TArray<SDK::UActorComponent*> Comps, ImColor color);
 
-void DrawPosition();
+void UnlockAllEffigies();
+
+void AddToInventoryContainer(__int32 mCount, __int32 mIndex = 0);
 
 void ResetStamina();
 
