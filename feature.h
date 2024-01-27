@@ -5,7 +5,7 @@
 
 void ESP();
 
-void ESP_DEBUG(double mDist, SDK::UClass* mEntType = SDK::AActor::StaticClass());
+void ESP_DEBUG(float mDist, ImVec4 color, SDK::UClass* mEntType = SDK::AActor::StaticClass());
 
 void DrawUActorComponent(SDK::TArray<SDK::UActorComponent*> Comps, ImColor color);
 
@@ -26,5 +26,3 @@ void AddAncientTechPoints(__int32 mPoints);
 void RemoveTechPoints(__int32 mPoints);
 
 void RemoveAncientTechPoint(__int32 mPoints);
-
-void AddToInventoryContainer(__int32 mCount, __int32 mIndex = 0);

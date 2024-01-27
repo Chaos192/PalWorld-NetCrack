@@ -88,45 +88,6 @@ void DrawUActorComponent(SDK::TArray<SDK::UActorComponent*> Comps,ImColor color)
 	}
 }
 
-
-void AddToInventoryContainer(__int32 mCount, __int32 mIndex)
-{
-	SDK::APalPlayerCharacter* p_appc = Config.GetPalPlayerCharacter();
-	if (!p_appc != NULL)
-		return;
-
-	SDK::APalPlayerController* p_apc = static_cast<SDK::APalPlayerController*>(p_appc->Controller);
-	if (!p_apc)
-		return;
-
-	SDK::APalPlayerState* p_apps = static_cast<SDK::APalPlayerState*>(p_apc->PlayerState);
-	if (!p_apps)
-		return;
-
-	SDK::UPalPlayerInventoryData* InventoryData = p_apps->GetInventoryData();
-	if (!InventoryData)
-		return;
-
-	SDK::UPalItemContainerMultiHelper* InventoryMultiHelper = InventoryData->InventoryMultiHelper;
-	if (!InventoryMultiHelper)
-		return;
-
-	SDK::TArray<class SDK::UPalItemContainer*> Containers = InventoryMultiHelper->Containers;
-	if (Containers.Num() <= 0)
-		return;
-
-	SDK::UPalItemSlot* pSelectedSlot = Containers[0]->Get(mIndex);
-
-	if (!pSelectedSlot != NULL)
-		return;
-
-	SDK::FPalItemId FirstItemId = pSelectedSlot->GetItemId();
-	int32 StackCount = pSelectedSlot->GetStackCount();
-	__int32 mNewCount = StackCount += mCount;
-	InventoryData->RequestAddItem(FirstItemId.StaticId, mNewCount, true);
-}
-
-
 void UnlockAllEffigies() {
 	SDK::APalPlayerCharacter* pPalCharacter = Config.GetPalPlayerCharacter();
 	if (!pPalCharacter)

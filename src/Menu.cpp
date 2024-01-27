@@ -466,7 +466,7 @@ namespace DX11_Base {
 			ImGui::ShowDemoWindow();
 
         if (Config.isDebugESP)
-            ESP_DEBUG(Config.mDebugESPDistance);
+            ESP_DEBUG(Config.mDebugESPDistance, ImVec4(0,1,0,1));
 	}
 
 	void Menu::MainMenu()
