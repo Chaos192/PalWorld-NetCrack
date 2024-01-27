@@ -268,6 +268,11 @@ namespace DX11_Base {
             ImGui::InputInt("Slot to modify (start 0):", &Config.AddItemSlot);
             ImGui::InputInt("Multiple of how much:", &Config.AddItemCount);
             
+            if (ImGui::Button("Give items from slot", ImVec2(ImGui::GetContentRegionAvail().x - 3, 20)))
+            {
+                AddToInventoryContainer(Config.AddItemCount, Config.AddItemSlot);
+            }
+            
             // this does not work lol
             // std::stringstream AddItemsString;
             // AddItemsString << "Give " << Config.AddItemCount << " items from slot" << Config.AddItemSlot;
