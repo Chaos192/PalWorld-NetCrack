@@ -20,9 +20,9 @@ void config::Update(const char* filterText)
     }
     std::sort(Config.db_filteredItems.begin(), Config.db_filteredItems.end());
 }
-const std::vector<std::string>& config::GetFilteredItems(){ return Config.db_filteredItems; }
+const std::vector<std::string>& config::GetFilteredItems() { return Config.db_filteredItems; }
 
-bool DetourTick(SDK::APalPlayerCharacter* m_this,float DeltaSecond)
+bool DetourTick(SDK::APalPlayerCharacter* m_this, float DeltaSecond)
 {
     if (m_this->GetPalPlayerController() != NULL)
     {
@@ -31,7 +31,7 @@ bool DetourTick(SDK::APalPlayerCharacter* m_this,float DeltaSecond)
             Config.localPlayer = m_this;
         }
     }
-        return OldTickFunc(m_this, DeltaSecond);
+    return OldTickFunc(m_this, DeltaSecond);
 }
 SDK::UWorld* config::GetUWorld()
 {
@@ -52,8 +52,8 @@ SDK::UPalCharacterImportanceManager* config::GetCharacterImpManager()
     if (!pWorld)
         return nullptr;
 
-    SDK::UGameInstance* pGameInstance = pWorld->OwningGameInstance; 
-    if (!pGameInstance) 
+    SDK::UGameInstance* pGameInstance = pWorld->OwningGameInstance;
+    if (!pGameInstance)
         return nullptr;
 
     return static_cast<SDK::UPalGameInstance*>(pGameInstance)->CharacterImportanceManager;
@@ -172,7 +172,7 @@ bool config::GetAllActorsofType(SDK::UClass* mType, std::vector<SDK::AActor*>* o
             if (!pActor || !pActor->RootComponent || (pActor == pLocalPlayer && bSkipLocalPlayer))
                 continue;
 
-            if (!pActor->IsA(mType)) 
+            if (!pActor->IsA(mType))
                 continue;
 
             result.push_back(pActor);
@@ -191,7 +191,7 @@ void config::Init()
 {
     //register hook
     Config.ClientBase = (DWORD64)GetModuleHandleA("PalWorld-Win64-Shipping.exe");
-    
+
     TickFunc = (Tick)(Config.ClientBase + Config.offset_Tick);
 
     MH_CreateHook(TickFunc, DetourTick, reinterpret_cast<void**>(&OldTickFunc));
