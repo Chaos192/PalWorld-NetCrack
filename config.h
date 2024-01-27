@@ -43,6 +43,8 @@ public:
 	SDK::TArray<SDK::APalPlayerCharacter*> AllPlayers = {};
 	SDK::UPalCharacterImportanceManager* UCIM = NULL;
 	SDK::UObject* WorldContextObject = NULL;
+	int AddItemSlot = 0;
+	int AddItemCount = 2;
 
 	enum QuickItemSet
 	{
