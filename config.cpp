@@ -78,9 +78,31 @@ SDK::APalPlayerState* config::GetPalPlayerState()
     return static_cast<SDK::APalPlayerState*>(pPlayer->PlayerState);
 }
 
-bool GetTAllPlayers(SDK::TArray<class SDK::APalCharacter*>* outResult)
+SDK::UPalPlayerInventoryData* config::GetInventoryComponent()
 {
-    SDK::UPalCharacterImportanceManager* mPal = config::GetCharacterImpManager();
+    SDK::APalPlayerState* pPlayerState = GetPalPlayerState();
+    if (!pPlayerState)
+        return nullptr;
+
+    return pPlayerState->InventoryData;
+}
+
+SDK::APalWeaponBase* config::GetPlayerEquippedWeapon()
+{
+    SDK::APalPlayerCharacter* pPalCharacter = GetPalPlayerCharacter();
+    if (!pPalCharacter)
+        return nullptr;
+
+    SDK::UPalShooterComponent* pWeaponInventory = pPalCharacter->ShooterComponent;
+    if (!pWeaponInventory)
+        return nullptr;
+
+    return pWeaponInventory->HasWeapon;
+}
+
+bool config::GetTAllPlayers(SDK::TArray<class SDK::APalCharacter*>* outResult)
+{
+    SDK::UPalCharacterImportanceManager* mPal = GetCharacterImpManager();
     if (!mPal)
         return false;
 
@@ -88,9 +110,9 @@ bool GetTAllPlayers(SDK::TArray<class SDK::APalCharacter*>* outResult)
     return true;
 }
 
-bool GetTAllImpNPC(SDK::TArray<class SDK::APalCharacter*>* outResult)
+bool config::GetTAllImpNPC(SDK::TArray<class SDK::APalCharacter*>* outResult)
 {
-    SDK::UPalCharacterImportanceManager* mPal = config::GetCharacterImpManager();
+    SDK::UPalCharacterImportanceManager* mPal = GetCharacterImpManager();
     if (!mPal)
         return false;
 
@@ -98,9 +120,9 @@ bool GetTAllImpNPC(SDK::TArray<class SDK::APalCharacter*>* outResult)
     return true;
 }
 
-bool GetTAllNPC(SDK::TArray<class SDK::APalCharacter*>* outResult)
+bool config::GetTAllNPC(SDK::TArray<class SDK::APalCharacter*>* outResult)
 {
-    SDK::UPalCharacterImportanceManager* mPal = config::GetCharacterImpManager();
+    SDK::UPalCharacterImportanceManager* mPal = GetCharacterImpManager();
     if (!mPal)
         return false;
 
@@ -108,9 +130,9 @@ bool GetTAllNPC(SDK::TArray<class SDK::APalCharacter*>* outResult)
     return true;
 }
 
-bool GetTAllPals(SDK::TArray<class SDK::APalCharacter*>* outResult)
+bool config::GetTAllPals(SDK::TArray<class SDK::APalCharacter*>* outResult)
 {
-    SDK::UPalCharacterImportanceManager* mPal = config::GetCharacterImpManager();
+    SDK::UPalCharacterImportanceManager* mPal = GetCharacterImpManager();
     if (!mPal)
         return false;
 
@@ -118,6 +140,52 @@ bool GetTAllPals(SDK::TArray<class SDK::APalCharacter*>* outResult)
     return true;
 }
 
+bool config::GetAllActorsofType(SDK::UClass* mType, std::vector<SDK::AActor*>* outArray, bool bLoopAllLevels, bool bSkipLocalPlayer)
+{
+    SDK::UWorld* pWorld = Config.gWorld;
+    if (!pWorld)
+        return false;
+
+    SDK::AActor* pLocalPlayer = static_cast<SDK::AActor*>(GetPalPlayerCharacter());
+    std::vector<SDK::AActor*> result;
+
+    //	Get Levels
+    SDK::TArray<SDK::ULevel*> pLevelsArray = pWorld->Levels;
+    __int32 levelsCount = pLevelsArray.Count();
+
+    //	Loop Levels Array
+    for (int i = 0; i < levelsCount; i++)
+    {
+        if (!pLevelsArray.IsValidIndex(i))
+            continue;
+
+        SDK::TArray<SDK::AActor*> pActorsArray = pLevelsArray[i]->Actors;
+        __int32 actorsCount = pActorsArray.Count();
+
+        //	Loop Actor Array
+        for (int j = 0; j < actorsCount; j++)
+        {
+            if (!pActorsArray.IsValidIndex(j))
+                continue;
+
+            SDK::AActor* pActor = pActorsArray[j];
+            if (!pActor || !pActor->RootComponent || (pActor == pLocalPlayer && bSkipLocalPlayer))
+                continue;
+
+            if (!pActor->IsA(mType)) 
+                continue;
+
+            result.push_back(pActor);
+        }
+
+        if (bLoopAllLevels)
+            continue;
+        else
+            break;
+    }
+    *outArray = result;
+    return result.size() > 0;
+}
 
 void config::Init()
 {

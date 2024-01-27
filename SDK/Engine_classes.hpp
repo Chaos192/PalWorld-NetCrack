@@ -13923,7 +13923,9 @@ public:
 class ULevel : public UObject
 {
 public:
-	uint8                                        Pad_336A[0x90];                                    // Fixing Size After Last Property  [ Dumper-7 ]
+	uint8                                        Pad_336A[0x70];                                    // Fixing Size After Last Property  [ Dumper-7 ]
+	TArray<class AActor*>						 Actors;											// 0x98
+	unsigned char								 kek_00A8[0x10];									// padding 
 	class UWorld*                                OwningWorld;                                       // 0xB8(0x8)(ZeroConstructor, Transient, NoDestructor, UObjectWrapper, HasGetValueTypeHash, NativeAccessSpecifierPublic)
 	class UModel*                                Model;                                             // 0xC0(0x8)(ZeroConstructor, NoDestructor, UObjectWrapper, HasGetValueTypeHash, NativeAccessSpecifierPublic)
 	TArray<class UModelComponent*>               ModelComponents;                                   // 0xC8(0x10)(ExportObject, ZeroConstructor, ContainsInstancedReference, UObjectWrapper, NativeAccessSpecifierPublic)

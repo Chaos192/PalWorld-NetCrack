@@ -518,9 +518,10 @@ namespace DX11_Base {
 
 		if (g_GameVariables->m_ShowDemo)
 			ImGui::ShowDemoWindow();
-	}
 
-   
+        if (Config.isDebugESP)
+            ESP_DEBUG(Config.mDebugESPDistance);
+	}
 
 	void Menu::MainMenu()
 	{
@@ -584,7 +585,6 @@ namespace DX11_Base {
 
 	void Menu::HUD(bool* p_open)
 	{
-
 	}
 
     void Menu::Loops()
