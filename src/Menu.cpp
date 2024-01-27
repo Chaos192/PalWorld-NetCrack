@@ -271,12 +271,12 @@ namespace DX11_Base {
             // this does not work lol
             // std::stringstream AddItemsString;
             // AddItemsString << "Give " << Config.AddItemCount << " items from slot" << Config.AddItemSlot;
-            if (ImGui::Button("Give items from slot", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
+            if (ImGui::Button("Give items from slot", ImVec2(ImGui::GetWindowContentRegionMax().x - 3, 20)))
             {
                 AddToInventoryContainer(Config.AddItemCount, Config.AddItemSlot);
             }
 
-            if (ImGui::Button("Unlock All Effigies", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
+            if (ImGui::Button("Unlock All Effigies", ImVec2(ImGui::GetWindowContentRegionMax().x - 3, 20)))
             {
                 UnlockAllEffigies();
             }
@@ -302,7 +302,7 @@ namespace DX11_Base {
                     }
                 }
             }*/
-            if (ImGui::Button("HomeTP", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
+            if (ImGui::Button("HomeTP", ImVec2(ImGui::GetWindowContentRegionMax().x - 3, 20)))
             {
                 SDK::APalPlayerCharacter* p_appc = Config.GetPalPlayerCharacter();
                 if (p_appc != NULL)
@@ -338,7 +338,7 @@ namespace DX11_Base {
                     }
                 }
             }*/
-            if (ImGui::Button("ToggleFly", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
+            if (ImGui::Button("ToggleFly", ImVec2(ImGui::GetWindowContentRegionMax().x - 3, 20)))
             {
                 Config.IsToggledFly = !Config.IsToggledFly;
                 ExploitFly(Config.IsToggledFly);
@@ -357,7 +357,7 @@ namespace DX11_Base {
                     }
                 }
             }*/
-            if (ImGui::Button("GodHealth", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
+            if (ImGui::Button("GodHealth", ImVec2(ImGui::GetWindowContentRegionMax().x - 3, 20)))
             {
                 SDK::APalPlayerCharacter* p_appc = Config.GetPalPlayerCharacter();
                 if (p_appc != NULL)
@@ -392,7 +392,7 @@ namespace DX11_Base {
                     }
                 }
             }
-            if (ImGui::Button("Equivalent", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
+            if (ImGui::Button("Equivalent", ImVec2(ImGui::GetWindowContentRegionMax().x - 3, 20)))
             {
                 Config.isEq = !Config.isEq;
                 ToggleEqui(Config.isEq);
