@@ -7,5 +7,7 @@ void ESP();
 
 void DrawUActorComponent(SDK::TArray<SDK::UActorComponent*> Comps,ImColor color);
 
-void DrawPosition();
+void UnlockAllEffigies();
+
+void AddToInventoryContainer(__int32 mCount, __int32 mIndex = 0);
 

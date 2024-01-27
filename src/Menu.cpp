@@ -264,6 +264,23 @@ namespace DX11_Base {
                     }
                 }
             }
+
+            ImGui::InputInt("Slot to modify (start 0):", &Config.AddItemSlot);
+            ImGui::InputInt("Multiple of how much:", &Config.AddItemCount);
+            
+            // this does not work lol
+            // std::stringstream AddItemsString;
+            // AddItemsString << "Give " << Config.AddItemCount << " items from slot" << Config.AddItemSlot;
+            if (ImGui::Button("Give items from slot", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
+            {
+                AddToInventoryContainer(Config.AddItemCount, Config.AddItemSlot);
+            }
+
+            if (ImGui::Button("Unlock All Effigies", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
+            {
+                UnlockAllEffigies();
+            }
+
            ////ImGui::InputText("Pal Name", Config.PalName, sizeof(Config.PalName));
            // //if (!Config.IsMonster){ImGui::InputInt("Pal Rank", &Config.PalRank);}
            // //if (Config.IsMonster) { ImGui::InputInt("Pal Count", &Config.PalNum); }
