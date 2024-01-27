@@ -97,7 +97,7 @@ public:
 		return Data[Index];
 	}
 
-	inline int32 Num()
+	inline int32 Count()
 	{
 		return NumElements;
 	}

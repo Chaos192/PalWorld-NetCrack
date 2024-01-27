@@ -29,6 +29,9 @@ public:
 	bool IsQuick = false;
 	bool matchDbItems = true;
 	bool isEq = false;
+	bool isDebugESP = false;
+	float mDebugESPDistance = 5.0f;
+
 	//def and value
 	float SpeedModiflers = 1.0f;
 	int DamageUp = 0;
@@ -39,6 +42,7 @@ public:
 	char ItemName[255];
 	char inputTextBuffer[255] = "";
 	int EqModifiler = 1;
+	SDK::UWorld* gWorld = nullptr;
 	SDK::APalPlayerCharacter* localPlayer = NULL;
 	SDK::TArray<SDK::APalPlayerCharacter*> AllPlayers = {};
 	SDK::UPalCharacterImportanceManager* UCIM = NULL;
@@ -60,8 +64,17 @@ public:
 
 	//static function
 	static SDK::UWorld* GetUWorld();
+	static SDK::UPalCharacterImportanceManager* GetCharacterImpManager();
 	static SDK::APalPlayerCharacter* GetPalPlayerCharacter();
+	static SDK::APalPlayerState* GetPalPlayerState();
+	static SDK::UPalPlayerInventoryData* GetInventoryComponent();
+	static SDK::APalWeaponBase* GetPlayerEquippedWeapon();
 	static SDK::TArray<SDK::APalPlayerCharacter*> GetTAllPlayers();
+	static bool	GetTAllPlayers(SDK::TArray<class SDK::APalCharacter*>* outResult);
+	static bool	GetTAllImpNPC(SDK::TArray<class SDK::APalCharacter*>* outResult);
+	static bool	GetTAllNPC(SDK::TArray<class SDK::APalCharacter*>* outResult);
+	static bool	GetTAllPals(SDK::TArray<class SDK::APalCharacter*>* outResult);
+	static bool GetAllActorsofType(SDK::UClass* mType, std::vector<SDK::AActor*>* outArray, bool bLoopAllLevels = false , bool bSkipLocalPlayer = false);
 	static void Init();
 	static void Update(const char* filterText);
 	static const std::vector<std::string>& GetFilteredItems();

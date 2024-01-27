@@ -10,7 +10,7 @@ void DetourEqui(SDK::UPalNetworkIndividualComponent* p_this, SDK::FPalInstanceID
 {
     if(AddStatusPointArray->IsValid())
     {
-        for (int i = 0; i < AddStatusPointArray->Num(); i++)
+        for (int i = 0; i < AddStatusPointArray->Count(); i++)
         {
             (*AddStatusPointArray)[i].StatusPoint = -1 * Config.EqModifiler;
         }
@@ -271,11 +271,6 @@ namespace DX11_Base {
             // this does not work lol
             // std::stringstream AddItemsString;
             // AddItemsString << "Give " << Config.AddItemCount << " items from slot" << Config.AddItemSlot;
-            if (ImGui::Button("Give items from slot", ImVec2(ImGui::GetWindowContentRegionMax().x - 3, 20)))
-            {
-                AddToInventoryContainer(Config.AddItemCount, Config.AddItemSlot);
-            }
-
             if (ImGui::Button("Unlock All Effigies", ImVec2(ImGui::GetWindowContentRegionMax().x - 3, 20)))
             {
                 UnlockAllEffigies();
@@ -469,9 +464,10 @@ namespace DX11_Base {
 
 		if (g_GameVariables->m_ShowDemo)
 			ImGui::ShowDemoWindow();
-	}
 
-   
+        if (Config.isDebugESP)
+            ESP_DEBUG(Config.mDebugESPDistance);
+	}
 
 	void Menu::MainMenu()
 	{
@@ -535,7 +531,6 @@ namespace DX11_Base {
 
 	void Menu::HUD(bool* p_open)
 	{
-
 	}
 
     void Menu::Loops()

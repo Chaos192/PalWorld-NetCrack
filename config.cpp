@@ -40,8 +40,23 @@ SDK::UWorld* config::GetUWorld()
     {
         auto gworld = signature("48 8B 05 ? ? ? ? EB 05").instruction(3).add(7);
         gworld_ptr = gworld.GetPointer();
+        if (gworld_ptr)
+            Config.gWorld = *(SDK::UWorld**)gworld_ptr;
     }
     return (*(SDK::UWorld**)(gworld_ptr));
+}
+
+SDK::UPalCharacterImportanceManager* config::GetCharacterImpManager()
+{
+    SDK::UWorld* pWorld = Config.gWorld;
+    if (!pWorld)
+        return nullptr;
+
+    SDK::UGameInstance* pGameInstance = pWorld->OwningGameInstance; 
+    if (!pGameInstance) 
+        return nullptr;
+
+    return static_cast<SDK::UPalGameInstance*>(pGameInstance)->CharacterImportanceManager;
 }
 
 SDK::APalPlayerCharacter* config::GetPalPlayerCharacter()
@@ -54,7 +69,123 @@ SDK::APalPlayerCharacter* config::GetPalPlayerCharacter()
     return nullptr;
 }
 
+SDK::APalPlayerState* config::GetPalPlayerState()
+{
+    SDK::APalPlayerCharacter* pPlayer = GetPalPlayerCharacter();
+    if (!pPlayer)
+        return nullptr;
 
+    return static_cast<SDK::APalPlayerState*>(pPlayer->PlayerState);
+}
+
+SDK::UPalPlayerInventoryData* config::GetInventoryComponent()
+{
+    SDK::APalPlayerState* pPlayerState = GetPalPlayerState();
+    if (!pPlayerState)
+        return nullptr;
+
+    return pPlayerState->InventoryData;
+}
+
+SDK::APalWeaponBase* config::GetPlayerEquippedWeapon()
+{
+    SDK::APalPlayerCharacter* pPalCharacter = GetPalPlayerCharacter();
+    if (!pPalCharacter)
+        return nullptr;
+
+    SDK::UPalShooterComponent* pWeaponInventory = pPalCharacter->ShooterComponent;
+    if (!pWeaponInventory)
+        return nullptr;
+
+    return pWeaponInventory->HasWeapon;
+}
+
+bool config::GetTAllPlayers(SDK::TArray<class SDK::APalCharacter*>* outResult)
+{
+    SDK::UPalCharacterImportanceManager* mPal = GetCharacterImpManager();
+    if (!mPal)
+        return false;
+
+    mPal->GetAllPlayer(outResult);
+    return true;
+}
+
+bool config::GetTAllImpNPC(SDK::TArray<class SDK::APalCharacter*>* outResult)
+{
+    SDK::UPalCharacterImportanceManager* mPal = GetCharacterImpManager();
+    if (!mPal)
+        return false;
+
+    mPal->GetImportantNPC(outResult);
+    return true;
+}
+
+bool config::GetTAllNPC(SDK::TArray<class SDK::APalCharacter*>* outResult)
+{
+    SDK::UPalCharacterImportanceManager* mPal = GetCharacterImpManager();
+    if (!mPal)
+        return false;
+
+    mPal->GetAllNPC(outResult);
+    return true;
+}
+
+bool config::GetTAllPals(SDK::TArray<class SDK::APalCharacter*>* outResult)
+{
+    SDK::UPalCharacterImportanceManager* mPal = GetCharacterImpManager();
+    if (!mPal)
+        return false;
+
+    mPal->GetAllPalCharacter(outResult);
+    return true;
+}
+
+bool config::GetAllActorsofType(SDK::UClass* mType, std::vector<SDK::AActor*>* outArray, bool bLoopAllLevels, bool bSkipLocalPlayer)
+{
+    SDK::UWorld* pWorld = Config.gWorld;
+    if (!pWorld)
+        return false;
+
+    SDK::AActor* pLocalPlayer = static_cast<SDK::AActor*>(GetPalPlayerCharacter());
+    std::vector<SDK::AActor*> result;
+
+    //	Get Levels
+    SDK::TArray<SDK::ULevel*> pLevelsArray = pWorld->Levels;
+    __int32 levelsCount = pLevelsArray.Count();
+
+    //	Loop Levels Array
+    for (int i = 0; i < levelsCount; i++)
+    {
+        if (!pLevelsArray.IsValidIndex(i))
+            continue;
+
+        SDK::TArray<SDK::AActor*> pActorsArray = pLevelsArray[i]->Actors;
+        __int32 actorsCount = pActorsArray.Count();
+
+        //	Loop Actor Array
+        for (int j = 0; j < actorsCount; j++)
+        {
+            if (!pActorsArray.IsValidIndex(j))
+                continue;
+
+            SDK::AActor* pActor = pActorsArray[j];
+            if (!pActor || !pActor->RootComponent || (pActor == pLocalPlayer && bSkipLocalPlayer))
+                continue;
+
+            if (!pActor->IsA(mType)) 
+                continue;
+
+            result.push_back(pActor);
+        }
+
+        if (bLoopAllLevels)
+            continue;
+        else
+            break;
+    }
+    *outArray = result;
+    return result.size() > 0;
+}
 
 void config::Init()
 {
