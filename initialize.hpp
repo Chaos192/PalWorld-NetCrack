@@ -11,7 +11,7 @@ void ClientBGThread()
 {
     while (g_Running) {
         g_Menu->Loops();
-        std::this_thread::sleep_for(0ms);
+        std::this_thread::sleep_for(1ms);
         std::this_thread::yield();
     }
 }
@@ -42,7 +42,12 @@ DWORD WINAPI MainThread_Initialize()
     g_Running = TRUE;
     while (g_Running)
     {
-        if (GetAsyncKeyState(VK_INSERT) & 1) g_GameVariables->m_ShowMenu = !g_GameVariables->m_ShowMenu;
+        if (GetAsyncKeyState(VK_INSERT) & 1)
+        {
+            g_GameVariables->m_ShowMenu = !g_GameVariables->m_ShowMenu;
+            g_GameVariables->m_ShowHud = !g_GameVariables->m_ShowMenu;
+        
+        }
     }
 
     ///  EXIT

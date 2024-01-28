@@ -52,8 +52,8 @@ void ESP_DEBUG(float mDist, ImVec4 color, UClass* mEntType)
 	{
 		FVector actorLocation = actor->K2_GetActorLocation();
 		FVector localPlayerLocation = pLocalPlayer->K2_GetActorLocation();
-		float distantTo = pLocalPlayer->GetDistanceTo(actor);
-		if (distantTo > mDist)
+		float distanceTo = GetDistanceToActor(pLocalPlayer, actor);
+		if (distanceTo > mDist)
 			continue;
 
 		FVector2D outScreen;
@@ -61,13 +61,13 @@ void ESP_DEBUG(float mDist, ImVec4 color, UClass* mEntType)
 			continue;
 
 		char data[0x256];
-		const char* StringData = "OBJECT: [%s]\nCLASS: [%s]\nINDEX: [%d]\nPOSITION: { %0.0f, %0.0f, %0.0f }\nDISTANCE: [%.0fm]";
-		if (distantTo >= 1000.f)
+		const char* StringData = "OBJECT: [%s]\nCLASS: [%s]\nPOSITION: { %0.0f, %0.0f, %0.0f }\nDISTANCE: [%.0fm]";
+		if (distanceTo >= 1000.f)
 		{
-			distantTo /= 1000.f;
-			StringData = "OBJECT: [%s]\nCLASS: [%s]\nINDEX: [%d]\nPOSITION: { %0.0f, %0.0f, %0.0f }\nDISTANCE: [%.0fkm]";
+			distanceTo /= 1000.f;
+			StringData = "OBJECT: [%s]\nCLASS: [%s]\nPOSITION: { %0.0f, %0.0f, %0.0f }\nDISTANCE: [%.0fkm]";
 		}
-		sprintf_s(data, StringData, actor->GetName().c_str(), actor->Class->GetFullName().c_str(), actorLocation.X, actorLocation.Y, actorLocation.Z, distantTo);
+		sprintf_s(data, StringData, actor->GetName().c_str(), actor->Class->GetFullName().c_str(), actorLocation.X, actorLocation.Y, actorLocation.Z, distanceTo);
 
 		ImVec2 screen = ImVec2(static_cast<float>(outScreen.X), static_cast<float>(outScreen.Y));
 		draw->AddText(screen, ImColor(color), data);
@@ -242,11 +242,17 @@ void SpeedHack(float mSpeed)
 	if (!pWorld)
 		return;
 
-	AWorldSettings* pWorldSettings = pWorld->K2_GetWorldSettings();
+	ULevel* pLevel = pWorld->PersistentLevel;
+	if (!pLevel)
+		return;
+
+	AWorldSettings* pWorldSettings = pLevel->WorldSettings;
 	if (!pWorldSettings)
 		return;
 
-	pWorldSettings->TimeDilation = mSpeed;
+	pWorld->PersistentLevel->WorldSettings->TimeDilation = mSpeed;
+
+	//	pWorldSettings->TimeDilation = mSpeed;
 }
 
 //	
@@ -451,6 +457,17 @@ void RemoveAncientTechPoint(__int32 mPoints)
 	pTechData->bossTechnologyPoint -= mPoints;
 }
 
+float GetDistanceToActor(AActor* pLocal, AActor* pTarget)
+{
+	if (!pLocal || !pTarget)
+		return -1.f;
+	
+	FVector pLocation = pLocal->K2_GetActorLocation();
+	FVector pTargetLocation = pTarget->K2_GetActorLocation();
+	double distance = sqrt(pow(pTargetLocation.X - pLocation.X, 2.0) + pow(pTargetLocation.Y - pLocation.Y, 2.0) + pow(pTargetLocation.Z - pLocation.Z, 2.0));
+
+	return distance / 100.0f;
+}
 
 ///	OLDER METHODS
 //SDK::FPalDebugOtomoPalInfo palinfo = SDK::FPalDebugOtomoPalInfo();

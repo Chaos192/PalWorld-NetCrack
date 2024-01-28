@@ -271,15 +271,21 @@ namespace DX11_Base
         
         void TABDebug()
         {
+            ImGui::Checkbox("DEBUG ESP", &Config.isDebugESP);
+            if (Config.isDebugESP)
+            {
+                ImGui::SameLine();
+                ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+                ImGui::SliderFloat("##DISTANCE", &Config.mDebugESPDistance, 1.0f, 100.f, "%.0f", ImGuiSliderFlags_AlwaysClamp);
+            }
 
             //  @TODO: print additional debug information
             if (ImGui::Button("PrintPlayerAddr", ImVec2(ImGui::GetContentRegionAvail().x - 3, 20)))
             {
                 SDK::APalPlayerCharacter* p_appc = Config.GetPalPlayerCharacter();
-                if (p_appc != NULL)
-                {
-                    g_Console->printdbg("\n\n[+] APalPlayerCharacter: %x [+]\n\n", Console::Colors::green, p_appc);
-                }
+                if (p_appc)
+                    g_Console->printdbg("\n\n[+] APalPlayerCharacter: 0x%llX\n", Console::Colors::green, p_appc);
+                
             }
 
             ImGui::InputTextWithHint("##INPUT", "INPUT GOBJECT fn NAME", inputBuffer_getFnAddr, 100);
@@ -293,9 +299,11 @@ namespace DX11_Base
                     static __int64 dwHandle = reinterpret_cast<__int64>(GetModuleHandle(0));
                     void* fnAddr = object->ExecFunction;
                     unsigned __int64 fnOffset = (reinterpret_cast<__int64>(fnAddr) - dwHandle);
-                    g_Console->printdbg("[+] Found %s @ 0x%llX\n", Console::Colors::yellow, input.c_str(), fnOffset);
-
+                    g_Console->printdbg("[+] Found [%s] -> 0x%llX\n", Console::Colors::yellow, input.c_str(), fnOffset);
                 }
+                else
+                    g_Console->printdbg("[!] OBJECT [%s] NOT FOUND!\n", Console::Colors::red, input.c_str());
+                memset(inputBuffer_getFnAddr, 0, 100);
             }
 
         }
@@ -303,23 +311,15 @@ namespace DX11_Base
 
 	void Menu::Draw()
 	{
-        if (Config.IsESP)
-            ESP();
 
 		if (g_GameVariables->m_ShowMenu)
 			MainMenu();
-
-        if (Config.bisOpenManager && g_GameVariables->m_ShowMenu)
-            ManagerMenu();
 
 		if (g_GameVariables->m_ShowHud)
 			HUD(&g_GameVariables->m_ShowHud);
 
 		if (g_GameVariables->m_ShowDemo)
 			ImGui::ShowDemoWindow();
-
-        if (Config.isDebugESP)
-            ESP_DEBUG(Config.mDebugESPDistance, ImVec4(0,1,0,1));
 	}
 
     void Menu::ManagerMenu()
@@ -468,6 +468,8 @@ namespace DX11_Base
             ImGui::PopStyleColor();
         }
         
+        ImGuiContext* pImGui = GImGui;
+
         //  Display Menu Content
         //Tabs::TABMain();
 
@@ -495,6 +497,13 @@ namespace DX11_Base
                 Tabs::TABConfig();
                 ImGui::EndTabItem();
             }
+#if DEBUG
+            if (ImGui::BeginTabItem("DEBUG"))
+            {
+                Tabs::TABDebug();
+                ImGui::EndTabItem();
+            }
+#endif
             if (Config.IsQuick && ImGui::BeginTabItem("Quick"))
             {
                 Tabs::TABQuick();
@@ -508,10 +517,45 @@ namespace DX11_Base
             ImGui::EndTabBar();
         }
         ImGui::End();
+
+
+
+        if (Config.bisOpenManager)
+            ManagerMenu();
 	}
 
 	void Menu::HUD(bool* p_open)
 	{
+        
+        ImGui::SetNextWindowPos(g_D3D11Window->pViewport->WorkPos);
+        ImGui::SetNextWindowSize(g_D3D11Window->pViewport->WorkSize);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, NULL);
+        ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.00f, 0.00f, 0.00f, 0.00f));
+        if (!ImGui::Begin("##HUDWINDOW", (bool*)true, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoInputs))
+        {
+            ImGui::PopStyleColor();
+            ImGui::PopStyleVar();
+            ImGui::End();
+            return;
+        }
+        ImGui::PopStyleColor();
+        ImGui::PopStyleVar();
+
+        auto ImDraw = ImGui::GetWindowDrawList();
+        auto draw_size = g_D3D11Window->pViewport->WorkSize;
+        auto center = ImVec2({ draw_size.x * .5f, draw_size.y * .5f });
+        auto top_center = ImVec2({ draw_size.x * .5f, draw_size.y * 0.0f });
+        
+        //  Watermark
+        ImDraw->AddText(top_center, g_Menu->dbg_RAINBOW, "PalWorld-NetCrack");
+
+        if (Config.IsESP)
+            ESP();
+
+        if (Config.isDebugESP)
+            ESP_DEBUG(Config.mDebugESPDistance, ImVec4(0, 1, 0, 1));
+
+        ImGui::End();
 	}
 
     void Menu::Loops()

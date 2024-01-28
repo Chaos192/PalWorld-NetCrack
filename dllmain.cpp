@@ -3,16 +3,15 @@
 #include "initialize.hpp"
 
 using namespace SDK;
+using namespace DX11_Base;
 
 extern DWORD WINAPI MainThread_Initialize();
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD  dwCallReason, LPVOID lpReserved)
 {
-    using namespace DX11_Base;
     g_hModule = hModule;
 
     switch (dwCallReason) {
         case (DLL_PROCESS_ATTACH): {
-            InitGObjects();
             DisableThreadLibraryCalls(hModule);
             CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)MainThread_Initialize, g_hModule, NULL, NULL);
             break;

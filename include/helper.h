@@ -1,5 +1,5 @@
 #pragma once
-#define DEBUG 0
+#define DEBUG 1
 
 //	External Libraries
 #include "../libs/ImGui/imgui.h"

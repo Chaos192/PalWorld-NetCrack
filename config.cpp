@@ -201,9 +201,11 @@ void config::Init()
     //register hook
     Config.ClientBase = (DWORD64)GetModuleHandleA("PalWorld-Win64-Shipping.exe");
 
-    TickFunc = (Tick)(Config.ClientBase + Config.offset_Tick);
+    SDK::InitGObjects();
 
     Config.gWorld = Config.GetUWorld();
+
+    TickFunc = (Tick)(Config.ClientBase + Config.offset_Tick);
 
     MH_CreateHook(TickFunc, DetourTick, reinterpret_cast<void**>(&OldTickFunc));
 
