@@ -242,12 +242,11 @@ namespace DX11_Base {
         void TABExploit()
         {
             //Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState()->RequestSpawnMonsterForPlayer(name, 5, 1);
-            ImGui::Checkbox("IsQuick", &Config.IsQuick);
-            ImGui::Checkbox("Open Manager", &Config.bisOpenManager);
-            ImGui::Checkbox("SafeTeleport", &Config.IsSafe);
+            ImGui::Checkbox("Show Quick Tab", &Config.IsQuick);
+            ImGui::Checkbox("Open Manager Menu", &Config.bisOpenManager);
+            ImGui::Checkbox("Show Teleporter Tab", &Config.bisTeleporter);
             //creadit 
             //ImGui::Checkbox("PalIsMonster", &Config.IsMonster);
-            ImGui::InputFloat3("Pos:", Config.Pos);
             ImGui::InputInt("EXP:", &Config.EXP);
             ImGui::InputText("Item Name", Config.ItemName,sizeof(Config.ItemName));
             ImGui::InputInt("Item Num", &Config.Item);
@@ -290,64 +289,6 @@ namespace DX11_Base {
             {
                 UnlockAllEffigies();
             }
-
-           ////ImGui::InputText("Pal Name", Config.PalName, sizeof(Config.PalName));
-           // //if (!Config.IsMonster){ImGui::InputInt("Pal Rank", &Config.PalRank);}
-           // //if (Config.IsMonster) { ImGui::InputInt("Pal Count", &Config.PalNum); }
-           // ImGui::InputInt("Pal lvl", &Config.PalLvL);
-            /*if (ImGui::Button("Spawn Pal", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
-            {
-                if (Config.GetPalPlayerCharacter() != NULL)
-                {
-                    if (Config.GetPalPlayerCharacter()->GetPalPlayerController() != NULL)
-                    {
-                        if (Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState() != NULL)
-                        {
-                            if (Config.PalName != NULL)
-                            {
-                                g_Console->printdbg("\n\n[+] PalName: %s [+]\n\n", g_Console->color.green, Config.ItemName);
-                                SpawnPal(Config.PalName,Config.IsMonster,Config.PalRank,Config.PalLvL,Config.PalNum);
-                            }
-                        }
-                    }
-                }
-            }*/
-            if (ImGui::Button("HomeTP", ImVec2(ImGui::GetContentRegionAvail().x - 3, 20)))
-            {
-                SDK::APalPlayerCharacter* p_appc = Config.GetPalPlayerCharacter();
-                if (p_appc != NULL)
-                {
-                    if (Config.GetPalPlayerCharacter()->GetPalPlayerController() != NULL)
-                    {
-                        if (Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState() != NULL)
-                        {
-                            if (Config.IsSafe)
-                            {
-                                Config.GetPalPlayerCharacter()->GetPalPlayerController()->TeleportToSafePoint_ToServer();
-                            }
-                            else
-                            {
-                                Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState()->RequestRespawn();
-                            }
-
-                        }
-                    }
-                }
-            }
-           /* if (ImGui::Button("AnywhereTP", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
-            {
-                if (Config.GetPalPlayerCharacter()!= NULL)
-                {
-                    if (Config.GetPalPlayerCharacter()->GetPalPlayerController() != NULL)
-                    {
-                        if (Config.Pos != NULL)
-                        {
-                            SDK::FVector vector = { Config.Pos[0],Config.Pos[1],Config.Pos[2] };
-                            AnyWhereTP(vector,Config.IsSafe);
-                        }
-                    }
-                }
-            }*/
             if (ImGui::Button("ToggleFly", ImVec2(ImGui::GetContentRegionAvail().x - 3, 20)))
             {
                 Config.IsToggledFly = !Config.IsToggledFly;
@@ -405,6 +346,7 @@ namespace DX11_Base {
         }
         void TABConfig()
         {
+            
             ImGui::Text("PalWorld Menu");
             ImGui::Text("VERSION: v1.2.3");
 
@@ -436,6 +378,46 @@ namespace DX11_Base {
                         continue;
                 //if (Config.matchDbItems) {}
                 //strcpy_s(Config.PalName, itemName.c_str());
+                }
+            }
+        }
+        void TABTeleporter()
+        {
+            ImGui::Checkbox("SafeTeleport", &Config.IsSafe);
+            if (ImGui::Button("Home", ImVec2(ImGui::GetContentRegionAvail().x - 3, 20)))
+            {
+                SDK::APalPlayerCharacter* p_appc = Config.GetPalPlayerCharacter();
+                if (p_appc != NULL)
+                {
+                    if (Config.GetPalPlayerCharacter()->GetPalPlayerController() != NULL)
+                    {
+                        if (Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState() != NULL)
+                        {
+                            if (Config.IsSafe)
+                            {
+                                Config.GetPalPlayerCharacter()->GetPalPlayerController()->TeleportToSafePoint_ToServer();
+                            }
+                            else
+                            {
+                                Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState()->RequestRespawn();
+                            }
+
+                        }
+                    }
+                }
+            }
+            ImGui::InputFloat3("Pos",Config.Pos);
+            ImGui::SameLine();
+            if (ImGui::Button("TP", ImVec2(ImGui::GetContentRegionAvail().x - 3, 20)))
+            {
+                SDK::FVector vector = { Config.Pos[0],Config.Pos[1],Config.Pos[2] };
+                AnyWhereTP(vector, Config.IsSafe);
+            }
+            for (const auto& pair : database::locationMap) {
+                const std::string& locationName = pair.first;
+                if (ImGui::Button(locationName.c_str())) {
+                    SDK::FVector location = SDK::FVector(pair.second[0], pair.second[1], pair.second[2]);
+                    AnyWhereTP(location, Config.IsSafe);
                 }
             }
         }
@@ -643,6 +625,11 @@ namespace DX11_Base {
           if (Config.IsQuick && ImGui::BeginTabItem("Quick"))
           {
               Tabs::TABQuick();
+              ImGui::EndTabItem();
+          }
+          if (Config.bisTeleporter && ImGui::BeginTabItem("Teleporter"))
+          {
+              Tabs::TABTeleporter();
               ImGui::EndTabItem();
           }
            ImGui::EndTabBar();

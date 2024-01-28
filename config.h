@@ -1,8 +1,8 @@
 #pragma once
 #include <Windows.h>
 #include "libs/utils/memory.h"
-#include "database.h"
 #include "SDK.hpp"
+#include "database.h"
 
 typedef bool(*Tick)(SDK::APalPlayerCharacter* m_this, float DeltaSecond);
 
@@ -30,6 +30,7 @@ public:
 	bool bisOpenManager = false;
 	bool filterPlayer = false;
 	bool bisRandomName = false;
+	bool bisTeleporter = false;
 	float SpeedModiflers = 1.0f;
 	//def and value
 	float mDebugESPDistance = 5.0f;
