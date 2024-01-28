@@ -21,7 +21,7 @@ DWORD WINAPI MainThread_Initialize()
     g_Console = std::make_unique<Console>();
 #if DEBUG
     g_Console->InitializeConsole("Debug Console");
-    g_Console->printdbg("ImGui Hook - Initializing . . .\n\n", g_Console->color.DEFAULT);
+    g_Console->printdbg("ImGui Hook - Initializing . . .\n\n", Console::Colors::DEFAULT);
 #endif
     ///  ESTABLISH GAME DATA   
     g_GameData = std::make_unique<GameData>();
@@ -34,7 +34,7 @@ DWORD WINAPI MainThread_Initialize()
     g_Hooking->Hook();
 
 #if DEBUG
-    g_Console->printdbg("Main::Initialized\n", g_Console->color.green);
+    g_Console->printdbg("Main::Initialized\nUWorld:\t0x%llX\n", Console::Colors::green, Config.gWorld);
 #endif
 
     std::thread WCMUpdate(ClientBGThread);	//	Initialize Loops Thread

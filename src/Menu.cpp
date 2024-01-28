@@ -36,122 +36,14 @@ int InputTextCallback(ImGuiInputTextCallbackData* data) {
 
     return 0;
 }
-//SDK::FPalDebugOtomoPalInfo palinfo = SDK::FPalDebugOtomoPalInfo();
-//SDK::TArray<SDK::EPalWazaID> EA = { 0U };
-//void SpawnPal(char* PalName, bool IsMonster, int rank=1, int lvl = 1, int count=1)
-//{
-//    SDK::UKismetStringLibrary* lib = SDK::UKismetStringLibrary::GetDefaultObj();
-//
-//    //Convert FNAME
-//    wchar_t  ws[255];
-//    swprintf(ws, 255, L"%hs", PalName);
-//    SDK::FName Name = lib->Conv_StringToName(SDK::FString(ws));
-//    //Call
-//    if (Config.GetPalPlayerCharacter() != NULL)
-//    {
-//        if (Config.GetPalPlayerCharacter()->GetPalPlayerController() != NULL)
-//        {
-//            if (Config.GetPalPlayerCharacter()->GetPalPlayerController())
-//            {
-//                if (Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState())
-//                {
-//                    if (IsMonster)
-//                    {
-//                        Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState()->RequestSpawnMonsterForPlayer(Name, count, lvl);
-//                        return;
-//                    }
-//                    EA[0] = SDK::EPalWazaID::AirCanon;
-//                    palinfo.Level = lvl;
-//                    palinfo.Rank = rank;
-//                    palinfo.PalName.Key = Name;
-//                    palinfo.WazaList = EA;
-//                    palinfo.PassiveSkill = NULL;
-//                    Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState()->Debug_CaptureNewMonsterByDebugOtomoInfo_ToServer(palinfo);
-//                }
-//            }
-//        }
-//    }
-//}
-void AddItem(SDK::UPalPlayerInventoryData* data,char* itemName, int count)
-{
-    SDK::UKismetStringLibrary* lib = SDK::UKismetStringLibrary::GetDefaultObj();
 
-    //Convert FNAME
-    wchar_t  ws[255];
-    swprintf(ws, 255, L"%hs",itemName);
-    SDK::FName Name = lib->Conv_StringToName(SDK::FString(ws));
-    //Call
-    data->RequestAddItem(Name, count, true);
-}
-void AnyWhereTP(SDK::FVector& vector,bool IsSafe)
+namespace DX11_Base 
 {
-        if (Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState() != NULL)
-        {
+    // helper variables
+    char inputBuffer_getFnAddr[100];
 
-            SDK::FGuid guid = Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPlayerUId();
-            vector = { vector.X,vector.Y + 100,vector.Z };
-            Config.GetPalPlayerCharacter()->GetPalPlayerController()->Transmitter->Player->RegisterRespawnLocation_ToServer(guid, vector);
-            Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState()->RequestRespawn();
-        }
-    return;
-}
-void ExploitFly(bool IsFly)
-{
-    SDK::APalPlayerCharacter* p_appc = Config.GetPalPlayerCharacter();
-    if (p_appc != NULL)
+    namespace Styles 
     {
-        if (IsFly)
-        {
-            if (Config.GetPalPlayerCharacter()->GetPalPlayerController() != NULL)
-            {
-                Config.GetPalPlayerCharacter()->GetPalPlayerController()->StartFlyToServer();
-            }
-        }
-        else
-        {
-            if (Config.GetPalPlayerCharacter()->GetPalPlayerController() != NULL)
-            {
-                Config.GetPalPlayerCharacter()->GetPalPlayerController()->EndFlyToServer();
-            }
-        }
-
-    }
-    return;
-}
-void Spawn_Multiple(config::QuickItemSet Set)
-{
-        SDK::UPalPlayerInventoryData * InventoryData = Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState()->GetInventoryData();
-        switch (Set)
-        {
-        case 0:
-            for (int i = 0; i < IM_ARRAYSIZE(database::basic_items_stackable); i++) {
-                AddItem(InventoryData, _strdup(database::basic_items_stackable[i].c_str()), 100);
-            }
-        case 1:
-            for (int i = 0; i < IM_ARRAYSIZE(database::basic_items_single); i++) 
-             {
-                    AddItem(InventoryData, _strdup(database::basic_items_single[i].c_str()), 1);
-             }
-        case 2:
-            for (int i = 0; i < IM_ARRAYSIZE(database::pal_unlock_skills); i++) {
-                AddItem(InventoryData, _strdup(database::pal_unlock_skills[i].c_str()), 1);
-            }
-        case 3:
-            for (int i = 0; i < IM_ARRAYSIZE(database::spheres); i++) {
-                AddItem(InventoryData, _strdup(database::spheres[i].c_str()), 100);
-            }
-        case 4:
-            for (int i = 0; i < IM_ARRAYSIZE(database::tools); i++) {
-                AddItem(InventoryData, _strdup(database::tools[i].c_str()), 1);
-            }
-        default:
-            break;
-        }
-}//Creadit:asashi
-
-namespace DX11_Base {
-
-    namespace Styles {
         void InitStyle()
         {
             ImGuiStyle& style = ImGui::GetStyle();
@@ -159,29 +51,26 @@ namespace DX11_Base {
 
             //	STYLE PROPERTIES
             style.WindowTitleAlign = ImVec2(0.5f, 0.5f);
-
-            //  Base ImGui Styling , Aplying a custyom style is left up to you.
             ImGui::StyleColorsClassic();
 
-            /// EXAMPLE COLOR 
-            //colors[ImGuiCol_FrameBg] = ImVec4(0, 0, 0, 0);
-
-            //	COLORS
-            if (g_Menu->dbg_RAINBOW_THEME) {
+            if (g_Menu->dbg_RAINBOW_THEME) 
+            {
                 //  RGB MODE STLYE PROPERTIES
                 colors[ImGuiCol_Separator] = ImVec4(g_Menu->dbg_RAINBOW);
                 colors[ImGuiCol_TitleBg] = ImVec4(0, 0, 0, 1.0f);
                 colors[ImGuiCol_TitleBgActive] = ImVec4(0, 0, 0, 1.0f);
                 colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0, 0, 0, 1.0f);
             }
-            else {
+            else 
+            {
                 /// YOUR DEFAULT STYLE PROPERTIES HERE
             }
         }
     }
 
 
-    namespace Tabs {
+    namespace Tabs 
+    {
         void TABPlayer()
         {
             
@@ -229,16 +118,8 @@ namespace DX11_Base {
             ImGui::SliderFloat("SpeedModifilers", &Config.SpeedModiflers, 1, 10);
             ImGui::SliderInt("AttackModifilers", &Config.DamageUp, 0, 200000);
             ImGui::SliderInt("defenseModifilers", &Config.DefuseUp, 0, 200000);
-            
-            if (ImGui::Button("PrintPlayerAddr", ImVec2(ImGui::GetContentRegionAvail().x - 3, 20)))
-            {
-                SDK::APalPlayerCharacter* p_appc = Config.GetPalPlayerCharacter();
-                if (p_appc != NULL)
-                {
-                    g_Console->printdbg("\n\n[+] APalPlayerCharacter: %x [+]\n\n", g_Console->color.green, p_appc);
-                }
-            }
         }
+        
         void TABExploit()
         {
             //Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState()->RequestSpawnMonsterForPlayer(name, 5, 1);
@@ -253,23 +134,14 @@ namespace DX11_Base {
             if (ImGui::Button("Give item", ImVec2(ImGui::GetContentRegionAvail().x - 3, 20)))
             {
                 SDK::APalPlayerCharacter* p_appc = Config.GetPalPlayerCharacter();
-                if (p_appc != NULL)
+                SDK::APalPlayerState* p_apps = Config.GetPalPlayerState();
+                if (p_appc && p_apps)
                 {
-
-                    if (Config.GetPalPlayerCharacter()->GetPalPlayerController() != NULL)
+                    SDK::UPalPlayerInventoryData* InventoryData = Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState()->GetInventoryData();
+                    if (InventoryData && (Config.ItemName != NULL))
                     {
-                        if (Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState() != NULL)
-                        {
-                            SDK::UPalPlayerInventoryData* InventoryData = Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState()->GetInventoryData();
-                            if (InventoryData != NULL)
-                            {
-                                if (Config.ItemName != NULL)
-                                {
-                                    g_Console->printdbg("\n\n[+] ItemName: %s [+]\n\n", g_Console->color.green, Config.ItemName);
-                                    AddItem(InventoryData, Config.ItemName, Config.Item);
-                                }
-                            }
-                        }
+                        g_Console->printdbg("\n\n[+] ItemName: %s [+]\n\n", Console::Colors::green, Config.ItemName);
+                        AddItemToInventoryByName(InventoryData, Config.ItemName, Config.Item);
                     }
                 }
             }
@@ -278,22 +150,20 @@ namespace DX11_Base {
             ImGui::InputInt("Multiple of how much:", &Config.AddItemCount);
             
             if (ImGui::Button("Give items from slot", ImVec2(ImGui::GetContentRegionAvail().x - 3, 20)))
-            {
-                AddToInventoryContainer(Config.AddItemCount, Config.AddItemSlot);
-            }
+                IncrementInventoryItemCountByIndex(Config.AddItemCount, Config.AddItemSlot);
             
             // this does not work lol
             // std::stringstream AddItemsString;
             // AddItemsString << "Give " << Config.AddItemCount << " items from slot" << Config.AddItemSlot;
             if (ImGui::Button("Unlock All Effigies", ImVec2(ImGui::GetContentRegionAvail().x - 3, 20)))
-            {
                 UnlockAllEffigies();
-            }
+
             if (ImGui::Button("ToggleFly", ImVec2(ImGui::GetContentRegionAvail().x - 3, 20)))
             {
                 Config.IsToggledFly = !Config.IsToggledFly;
                 ExploitFly(Config.IsToggledFly);
             }
+
             /*if (ImGui::Button("DeleteSelf", ImVec2(ImGui::GetWindowContentRegionWidth() - 3, 20)))
             {
                 SDK::APalPlayerCharacter* p_appc = Config.GetPalPlayerCharacter();
@@ -308,42 +178,15 @@ namespace DX11_Base {
                     }
                 }
             }*/
+
             if (ImGui::Button("GodHealth", ImVec2(ImGui::GetContentRegionAvail().x - 3, 20)))
-            {
-                SDK::APalPlayerCharacter* p_appc = Config.GetPalPlayerCharacter();
-                if (p_appc != NULL)
-                {
-                    if (Config.GetPalPlayerCharacter()->GetPalPlayerController() != NULL)
-                    {
-                        if (Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState() != NULL)
-                        {
-                            SDK::FFixedPoint fixpoint = SDK::FFixedPoint();
-                            fixpoint.Value = 99999999;
-                            Config.GetPalPlayerCharacter()->ReviveCharacter_ToServer(fixpoint);
-                            
-                        }
-                    }
-                }
-            }
+                ReviveLocalPlayer();
+
             //Creadit WoodgamerHD
-            if(ImGui::Button("Give exp", ImVec2(ImGui::GetContentRegionAvail().x - 3, 20)))
-            {
-                SDK::APalPlayerCharacter* p_appc = Config.GetPalPlayerCharacter();
-                if (p_appc != NULL)
-                {
-                    if (Config.GetPalPlayerCharacter()->GetPalPlayerController() != NULL)
-                    {
-                        if (Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState() != NULL)
-                        {
-                            if (Config.EXP >= 0)
-                            {
-                                Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState()->GrantExpForParty(Config.EXP);
-                            }
-                        }
-                    }
-                }
-            }
+            if (ImGui::Button("Give exp", ImVec2(ImGui::GetContentRegionAvail().x - 3, 20)))
+                GiveExperiencePoints(Config.EXP);
         }
+        
         void TABConfig()
         {
             
@@ -355,12 +198,13 @@ namespace DX11_Base {
             ImGui::Spacing();
             if (ImGui::Button("UNHOOK DLL", ImVec2(ImGui::GetContentRegionAvail().x - 3, 20))) {
 #if DEBUG
-                g_Console->printdbg("\n\n[+] UNHOOK INITIALIZED [+]\n\n", g_Console->color.red);
+                g_Console->printdbg("\n\n[+] UNHOOK INITIALIZED [+]\n\n", Console::Colors::red);
 
 #endif
                 g_KillSwitch = TRUE;
             }
         }
+        
         void TABDatabase()
         {
             //ImGui::Checkbox("IsItems", &Config.matchDbItems);
@@ -381,31 +225,13 @@ namespace DX11_Base {
                 }
             }
         }
+        
         void TABTeleporter()
         {
             ImGui::Checkbox("SafeTeleport", &Config.IsSafe);
             if (ImGui::Button("Home", ImVec2(ImGui::GetContentRegionAvail().x - 3, 20)))
-            {
-                SDK::APalPlayerCharacter* p_appc = Config.GetPalPlayerCharacter();
-                if (p_appc != NULL)
-                {
-                    if (Config.GetPalPlayerCharacter()->GetPalPlayerController() != NULL)
-                    {
-                        if (Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState() != NULL)
-                        {
-                            if (Config.IsSafe)
-                            {
-                                Config.GetPalPlayerCharacter()->GetPalPlayerController()->TeleportToSafePoint_ToServer();
-                            }
-                            else
-                            {
-                                Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState()->RequestRespawn();
-                            }
+                RespawnLocalPlayer(Config.IsSafe);
 
-                        }
-                    }
-                }
-            }
             ImGui::InputFloat3("Pos",Config.Pos);
             ImGui::SameLine();
             if (ImGui::Button("TP", ImVec2(ImGui::GetContentRegionAvail().x - 3, 20)))
@@ -413,46 +239,78 @@ namespace DX11_Base {
                 SDK::FVector vector = { Config.Pos[0],Config.Pos[1],Config.Pos[2] };
                 AnyWhereTP(vector, Config.IsSafe);
             }
-            for (const auto& pair : database::locationMap) {
+
+            for (const auto& pair : database::locationMap) 
+            {
                 const std::string& locationName = pair.first;
-                if (ImGui::Button(locationName.c_str())) {
+                if (ImGui::Button(locationName.c_str())) 
+                {
                     SDK::FVector location = SDK::FVector(pair.second[0], pair.second[1], pair.second[2]);
                     AnyWhereTP(location, Config.IsSafe);
                 }
             }
         }
-        void TABQuick()//Creadit:asashi
+
+        void TABQuick()
         {
-                if (ImGui::Button("Basic Items stack", ImVec2(ImGui::GetContentRegionAvail().x - 3, 20))) {
-                    Spawn_Multiple(config::QuickItemSet::basic_items_stackable);
+            if (ImGui::Button("Basic Items stack", ImVec2(ImGui::GetContentRegionAvail().x - 3, 20)))
+                SpawnMultiple_ItemsToInventory(config::QuickItemSet::basic_items_stackable);
+
+            if (ImGui::Button("Basic Items single", ImVec2(ImGui::GetContentRegionAvail().x - 3, 20)))
+                SpawnMultiple_ItemsToInventory(config::QuickItemSet::basic_items_single);
+
+            if (ImGui::Button("Unlock Pal skills", ImVec2(ImGui::GetContentRegionAvail().x - 3, 20)))
+                SpawnMultiple_ItemsToInventory(config::QuickItemSet::pal_unlock_skills);
+
+            if (ImGui::Button("Spheres", ImVec2(ImGui::GetContentRegionAvail().x - 3, 20)))
+                SpawnMultiple_ItemsToInventory(config::QuickItemSet::spheres);
+
+            if (ImGui::Button("Tools", ImVec2(ImGui::GetContentRegionAvail().x - 3, 20)))
+                    SpawnMultiple_ItemsToInventory(config::QuickItemSet::tools);
+        }
+        
+        void TABDebug()
+        {
+
+            //  @TODO: print additional debug information
+            if (ImGui::Button("PrintPlayerAddr", ImVec2(ImGui::GetContentRegionAvail().x - 3, 20)))
+            {
+                SDK::APalPlayerCharacter* p_appc = Config.GetPalPlayerCharacter();
+                if (p_appc != NULL)
+                {
+                    g_Console->printdbg("\n\n[+] APalPlayerCharacter: %x [+]\n\n", Console::Colors::green, p_appc);
                 }
-                if (ImGui::Button("Basic Items single", ImVec2(ImGui::GetContentRegionAvail().x - 3, 20))) {
-                    Spawn_Multiple(config::QuickItemSet::basic_items_single);
+            }
+
+            ImGui::InputTextWithHint("##INPUT", "INPUT GOBJECT fn NAME", inputBuffer_getFnAddr, 100);
+            ImGui::SameLine();
+            if (ImGui::Button("GET fn", ImVec2(ImGui::GetContentRegionAvail().x, 20)))
+            {
+                std::string input = inputBuffer_getFnAddr;
+                SDK::UFunction* object = SDK::UObject::FindObject<SDK::UFunction>(input);
+                if (object)
+                {
+                    static __int64 dwHandle = reinterpret_cast<__int64>(GetModuleHandle(0));
+                    void* fnAddr = object->ExecFunction;
+                    unsigned __int64 fnOffset = (reinterpret_cast<__int64>(fnAddr) - dwHandle);
+                    g_Console->printdbg("[+] Found %s @ 0x%llX\n", Console::Colors::yellow, input.c_str(), fnOffset);
+
                 }
-                if (ImGui::Button("Unlock Pal skills", ImVec2(ImGui::GetContentRegionAvail().x - 3, 20))) {
-                    Spawn_Multiple(config::QuickItemSet::pal_unlock_skills);
-                }
-                if (ImGui::Button("Spheres", ImVec2(ImGui::GetContentRegionAvail().x - 3, 20))) {
-                    Spawn_Multiple(config::QuickItemSet::spheres);
-                }
-                if (ImGui::Button("Tools", ImVec2(ImGui::GetContentRegionAvail().x - 3, 20))) {
-                    Spawn_Multiple(config::QuickItemSet::tools);
-                }
+            }
+
         }
 	}
 
 	void Menu::Draw()
 	{
         if (Config.IsESP)
-        {
             ESP();
-        }
+
 		if (g_GameVariables->m_ShowMenu)
 			MainMenu();
+
         if (Config.bisOpenManager && g_GameVariables->m_ShowMenu)
-        {
             ManagerMenu();
-        }
 
 		if (g_GameVariables->m_ShowHud)
 			HUD(&g_GameVariables->m_ShowHud);
@@ -463,118 +321,133 @@ namespace DX11_Base {
         if (Config.isDebugESP)
             ESP_DEBUG(Config.mDebugESPDistance, ImVec4(0,1,0,1));
 	}
+
     void Menu::ManagerMenu()
     {
-        if (ImGui::Begin("Manager", &g_GameVariables->m_ShowMenu, 96))
+        if (!ImGui::Begin("Manager", &g_GameVariables->m_ShowMenu, 96))
         {
-            if (Config.GetUWorld() != NULL)
+            ImGui::End();
+            return;
+        }
+
+        
+        if (Config.gWorld)
+        {
+            ImGui::Checkbox("filterPlayer", &Config.filterPlayer);
+            SDK::TArray<SDK::AActor*> T = Config.GetUWorld()->PersistentLevel->Actors;
+            for (int i = 0; i < T.Count(); i++)
             {
-                ImGui::Checkbox("filterPlayer", &Config.filterPlayer);
-                SDK::TArray<SDK::AActor*> T = Config.GetUWorld()->PersistentLevel->Actors;
-                for (int i = 0; i < T.Count(); i++)
+                if (!T[i])
+                    continue;
+
+                if (!T[i]->IsA(SDK::APalCharacter::StaticClass()))
+                    continue;
+
+                SDK::APalCharacter* Character = (SDK::APalCharacter*)T[i];
+                SDK::FString name;
+                if (Config.filterPlayer)
                 {
-                    if (T[i] != NULL)
+                    if (!T[i]->IsA(SDK::APalPlayerCharacter::StaticClass()))
+                        continue;
+                }
+                if (T[i]->IsA(SDK::APalPlayerCharacter::StaticClass()))
+                {
+                    if (!Character)
+                        continue;
+
+                    Character->CharacterParameterComponent->GetNickname(&name);
+                }
+                else
+                {
+                    SDK::UKismetStringLibrary* lib = SDK::UKismetStringLibrary::GetDefaultObj();
+                    if (!Character)
+                        continue;
+
+                    std::string s = Character->GetFullName();
+                    size_t firstUnderscorePos = s.find('_');
+
+                    if (firstUnderscorePos != std::string::npos) 
                     {
-                        if (T[i]->IsA(SDK::APalCharacter::StaticClass()))
+                        std::string result = s.substr(firstUnderscorePos + 1);
+
+                        size_t secondUnderscorePos = result.find('_');
+
+                        if (secondUnderscorePos != std::string::npos) {
+                            result = result.substr(0, secondUnderscorePos);
+                        }
+                        wchar_t  ws[255];
+                        swprintf(ws, 255, L"%hs", result);
+                        name = SDK::FString(ws);
+                    }
+                }
+                ImGui::Text(name.ToString().c_str());
+                ImGui::SameLine();
+                ImGui::PushID(i);
+                if (ImGui::Button("Kill"))
+                {
+                    if (T[i]->IsA(SDK::APalCharacter::StaticClass()))
+                        Damage(Character, 99999999999);
+                }
+                ImGui::SameLine();
+                if (ImGui::Button("TP"))
+                {
+                    if (Config.GetPalPlayerCharacter() != NULL)
+                    {
+                        if (Character)
                         {
-                            SDK::APalCharacter* Character = (SDK::APalCharacter*)T[i];
-                            SDK::FString name;
-                            if (Config.filterPlayer)
-                            {
-                                if (!T[i]->IsA(SDK::APalPlayerCharacter::StaticClass()))
-                                {
-                                    continue;
-                                }
-                            }
-                            if (T[i]->IsA(SDK::APalPlayerCharacter::StaticClass()))
-                            {
-                                if (!Character) { continue; }
-                                Character->CharacterParameterComponent->GetNickname(&name);
-                            }
-                            else
-                            {
-                                SDK::UKismetStringLibrary* lib = SDK::UKismetStringLibrary::GetDefaultObj();
-                                if (!Character) { continue; }
-                                std::string s = Character->GetFullName();
-                                size_t firstUnderscorePos = s.find('_');
-
-                                if (firstUnderscorePos != std::string::npos) {
-                                    std::string result = s.substr(firstUnderscorePos + 1);
-
-                                    size_t secondUnderscorePos = result.find('_');
-
-                                    if (secondUnderscorePos != std::string::npos) {
-                                        result = result.substr(0, secondUnderscorePos);
-                                    }
-                                    wchar_t  ws[255];
-                                    swprintf(ws, 255, L"%hs", result);
-                                    name = SDK::FString(ws);
-                                }
-                            }
-                            ImGui::Text(name.ToString().c_str());
-                            ImGui::SameLine();
-                            ImGui::PushID(i);
-                            if (ImGui::Button("Kill"))
-                            {
-                                if (T[i]->IsA(SDK::APalCharacter::StaticClass()))
-                                {
-                                    Damage(Character, 99999999999);
-                                }
-                                continue;
-                            }
-                            ImGui::SameLine();
-                            if (ImGui::Button("TP"))
-                            {
-                                if (Config.GetPalPlayerCharacter() != NULL)
-                                {
-                                    if (!Character) { continue; }
-                                    SDK::FVector vector = Character->K2_GetActorLocation();
-                                    AnyWhereTP(vector, Config.IsSafe);
-                                }
-                            }
-
-                            /*if (Character->IsA(SDK::APalPlayerCharacter::StaticClass()))
-                            {
-                                ImGui::SameLine();
-                                if (ImGui::Button("Boss"))
-                                {
-                                    if (Config.GetPalPlayerCharacter() != NULL)
-                                    {
-                                        auto controller = Config.GetPalPlayerCharacter()->GetPalPlayerController();
-                                        if (controller != NULL)
-                                        {
-                                            controller->Transmitter->BossBattle->RequestBossBattleEntry_ToServer(SDK::EPalBossType::ElectricBoss, (SDK::APalPlayerCharacter*)Character);
-                                            controller->Transmitter->BossBattle->RequestBossBattleStart_ToServer(SDK::EPalBossType::ElectricBoss, (SDK::APalPlayerCharacter*)Character);
-                                        }
-                                    }
-                                }
-                            }*/
-                            if (Character->IsA(SDK::APalPlayerCharacter::StaticClass()))
-                            {
-                                ImGui::SameLine();
-                                if (ImGui::Button("MaskIt"))
-                                {
-                                    if (Config.GetPalPlayerCharacter() != NULL)
-                                    {
-                                        auto controller = Config.GetPalPlayerCharacter()->GetPalPlayerController();
-                                        if (controller != NULL)
-                                        {
-                                            auto player = (SDK::APalPlayerCharacter*)Character;
-                                            SDK::FString fakename;
-                                            player->CharacterParameterComponent->GetNickname(&fakename);
-                                            Config.GetPalPlayerCharacter()->GetPalPlayerController()->Transmitter->NetworkIndividualComponent->UpdateCharacterNickName_ToServer(Config.GetPalPlayerCharacter()->CharacterParameterComponent->IndividualHandle->ID, fakename);
-                                        }
-                                    }
-                                }
-                            }
-                            ImGui::PopID();
+                            SDK::FVector vector = Character->K2_GetActorLocation();
+                            AnyWhereTP(vector, Config.IsSafe);
                         }
                     }
                 }
+
+                /*if (Character->IsA(SDK::APalPlayerCharacter::StaticClass()))
+                {
+                    ImGui::SameLine();
+                    if (ImGui::Button("Boss"))
+                    {
+                        if (Config.GetPalPlayerCharacter() != NULL)
+                        {
+                            auto controller = Config.GetPalPlayerCharacter()->GetPalPlayerController();
+                            if (controller != NULL)
+                            {
+                                controller->Transmitter->BossBattle->RequestBossBattleEntry_ToServer(SDK::EPalBossType::ElectricBoss, (SDK::APalPlayerCharacter*)Character);
+                                controller->Transmitter->BossBattle->RequestBossBattleStart_ToServer(SDK::EPalBossType::ElectricBoss, (SDK::APalPlayerCharacter*)Character);
+                            }
+                        }
+                    }
+                }*/
+                if (Character->IsA(SDK::APalPlayerCharacter::StaticClass()))
+                {
+                    ImGui::SameLine();
+                    if (ImGui::Button("MaskIt"))
+                    {
+                        if (Config.GetPalPlayerCharacter() != NULL)
+                        {
+                            auto controller = Config.GetPalPlayerCharacter()->GetPalPlayerController();
+                            if (controller != NULL)
+                            {
+                                auto player = (SDK::APalPlayerCharacter*)Character;
+                                SDK::FString fakename;
+                                player->CharacterParameterComponent->GetNickname(&fakename);
+                                Config.GetPalPlayerCharacter()->GetPalPlayerController()->Transmitter->NetworkIndividualComponent->UpdateCharacterNickName_ToServer(Config.GetPalPlayerCharacter()->CharacterParameterComponent->IndividualHandle->ID, fakename);
+                            }
+                        }
+                    }
+                }
+                ImGui::PopID();
             }
+
         }
+
+        if (Config.GetUWorld() != NULL)
+        {
+        }
+        
+        ImGui::End();
     }
-	void Menu::MainMenu()
+	
+    void Menu::MainMenu()
 	{
         if (!g_GameVariables->m_ShowDemo)
             Styles::InitStyle();
@@ -602,41 +475,39 @@ namespace DX11_Base {
 
         if (ImGui::BeginTabBar("##tabs", ImGuiTabBarFlags_None))
         {
-          if (ImGui::BeginTabItem("Player"))
-           {
-               Tabs::TABPlayer();
-               ImGui::EndTabItem();
-           }
-          if (ImGui::BeginTabItem("EXPLOIT"))
-          {
-              Tabs::TABExploit();
-              ImGui::EndTabItem();
-          }
-          if (ImGui::BeginTabItem("Database"))
-          {
-              Tabs::TABDatabase();
-              ImGui::EndTabItem();
-          }
-          if (ImGui::BeginTabItem("CONFIG"))
-          {
-              Tabs::TABConfig();
-              ImGui::EndTabItem();
-          }
-          if (Config.IsQuick && ImGui::BeginTabItem("Quick"))
-          {
-              Tabs::TABQuick();
-              ImGui::EndTabItem();
-          }
-          if (Config.bisTeleporter && ImGui::BeginTabItem("Teleporter"))
-          {
-              Tabs::TABTeleporter();
-              ImGui::EndTabItem();
-          }
-           ImGui::EndTabBar();
+            if (ImGui::BeginTabItem("Player"))
+            {
+                Tabs::TABPlayer();
+                ImGui::EndTabItem();
+            }
+            if (ImGui::BeginTabItem("EXPLOIT"))
+            {
+                Tabs::TABExploit();
+                ImGui::EndTabItem();
+            }
+            if (ImGui::BeginTabItem("Database"))
+            {
+                Tabs::TABDatabase();
+                ImGui::EndTabItem();
+            }
+            if (ImGui::BeginTabItem("CONFIG"))
+            {
+                Tabs::TABConfig();
+                ImGui::EndTabItem();
+            }
+            if (Config.IsQuick && ImGui::BeginTabItem("Quick"))
+            {
+                Tabs::TABQuick();
+                ImGui::EndTabItem();
+            }
+            if (Config.bisTeleporter && ImGui::BeginTabItem("Teleporter"))
+            {
+                Tabs::TABTeleporter();
+                ImGui::EndTabItem();
+            }
+            ImGui::EndTabBar();
         }
         ImGui::End();
-
-        
 	}
 
 	void Menu::HUD(bool* p_open)
@@ -645,94 +516,31 @@ namespace DX11_Base {
 
     void Menu::Loops()
     {
+        //  Respawn
         if ((GetAsyncKeyState(VK_F5) & 1))
-        {
-            SDK::APalPlayerCharacter* p_appc = Config.GetPalPlayerCharacter();
-            if (p_appc != NULL)
-            {
-                if (Config.GetPalPlayerCharacter()->GetPalPlayerController() != NULL)
-                {
-                    if (Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState() != NULL)
-                    {
-                        if (Config.IsSafe)
-                        {
-                            Config.GetPalPlayerCharacter()->GetPalPlayerController()->TeleportToSafePoint_ToServer();
-                        }
-                        else
-                        {
-                            Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState()->RequestRespawn();
+            RespawnLocalPlayer(Config.IsSafe);
 
-                        }
-
-                    }
-                }
-            }
-        }
+        //  Revive Player
         if ((GetAsyncKeyState(VK_F6) & 1))
-        {
-            SDK::APalPlayerCharacter* p_appc = Config.GetPalPlayerCharacter();
-            if (p_appc != NULL)
-            {
-                if (Config.GetPalPlayerCharacter()->GetPalPlayerController() != NULL)
-                {
-                    if (Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState() != NULL)
-                    {
-                        SDK::FFixedPoint fixpoint = SDK::FFixedPoint();
-                        fixpoint.Value = 99999999;
-                        Config.GetPalPlayerCharacter()->ReviveCharacter_ToServer(fixpoint);
+            ReviveLocalPlayer();
 
-                    }
-                }
-            }
-        }
+        //  
         if (Config.IsSpeedHack)
-        {
-            if (Config.GetUWorld()
-                || Config.GetUWorld()->PersistentLevel
-                || Config.GetUWorld()->PersistentLevel->WorldSettings)
-           {
-                Config.GetUWorld()->PersistentLevel->WorldSettings->TimeDilation = Config.SpeedModiflers;
-           }
-        }
+            SpeedHack(Config.SpeedModiflers);
+        
+        //  
         if (Config.IsAttackModiler)
-        {
-            if (Config.GetPalPlayerCharacter() != NULL && Config.GetPalPlayerCharacter()->CharacterParameterComponent->AttackUp != Config.DamageUp)
-            {
-                if (Config.GetPalPlayerCharacter()->CharacterParameterComponent != NULL)
-                {
-                    Config.GetPalPlayerCharacter()->CharacterParameterComponent->AttackUp = Config.DamageUp;
-                }
-            }
-        }
-        //Creadit Mokobake
-        /**
-           if (Config.GetPalPlayerCharacter() != NULL)
-            {
-                if (Config.GetPalPlayerCharacter()->CharacterParameterComponent != NULL)
-                {
-                    Config.GetPalPlayerCharacter()->CharacterParameterComponent->bIsEnableMuteki = Config.IsMuteki;
-                }
-            }**/
+            SetPlayerDefenseParam(Config.DamageUp);
+
+        //  
         if (Config.IsDefuseModiler)
-        {
-            if (Config.GetPalPlayerCharacter() != NULL && Config.GetPalPlayerCharacter()->CharacterParameterComponent->DefenseUp != Config.DefuseUp)
-            {
-                if (Config.GetPalPlayerCharacter()->CharacterParameterComponent != NULL)
-                {
-                    Config.GetPalPlayerCharacter()->CharacterParameterComponent->DefenseUp = Config.DefuseUp;
-                }
-            }
-        }
+            SetPlayerDefenseParam(Config.DefuseUp);
+
+        //  
         if (Config.IsInfStamina)
-        {
-            if (Config.GetPalPlayerCharacter() != NULL)
-            {
-                if (Config.GetPalPlayerCharacter()->CharacterParameterComponent != NULL)
-                {
-                    Config.GetPalPlayerCharacter()->CharacterParameterComponent->ResetSP();
-                }
-            }
-        }
- 
+            ResetStamina();
+
+        //  
+        //  SetDemiGodMode(Config.IsMuteki);
     }
 }

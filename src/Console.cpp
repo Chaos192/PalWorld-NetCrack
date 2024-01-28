@@ -26,7 +26,7 @@ namespace DX11_Base {
 		va_start(arg, Color);
 		vfprintf(stream_out, Text, arg);
 		va_end(arg);
-		SetConsoleTextAttribute(g_Handle, color.DEFAULT);
+		SetConsoleTextAttribute(g_Handle, Colors::DEFAULT);
 		return;
 	}
 
@@ -47,13 +47,13 @@ namespace DX11_Base {
 		switch (FLAG) {
 		case(TRUE):
 			output = " [ON]\n";
-			color = g_Console->color.green;
+			color = Colors::green;
 			append = TEXT + output;
 			printdbg(append.c_str(), color);
 			break;
 		case(FALSE):
 			output = " [OFF]\n";
-			color = g_Console->color.red;
+			color = Colors::red;
 			append = TEXT + output;
 			printdbg(append.c_str(), color);
 			break;

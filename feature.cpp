@@ -2,6 +2,7 @@
 #include "feature.h"
 using namespace SDK;
 
+//	should only be called from a GUI thread with ImGui context
 void ESP()
 {
 	APalPlayerCharacter* pPalCharacter = Config.GetPalPlayerCharacter();
@@ -28,6 +29,8 @@ void ESP()
 		ImGui::GetBackgroundDrawList()->AddText(nullptr, 16, ImVec2(10, 10 + (i * 30)), ImColor(128,0,0), T[i]->GetFullName().c_str());
 }
 
+//	draws debug information for the input actor array
+//	should only be called from a GUI thread with ImGui context
 void ESP_DEBUG(float mDist, ImVec4 color, UClass* mEntType)
 {
 	APalPlayerCharacter* pLocalPlayer = Config.GetPalPlayerCharacter();
@@ -42,7 +45,7 @@ void ESP_DEBUG(float mDist, ImVec4 color, UClass* mEntType)
 	if (!config::GetAllActorsofType(mEntType, &actors, true))
 		return;
 	
-	auto draw = ImGui::GetWindowDrawList();
+	auto draw = ImGui::GetBackgroundDrawList();
 
 	__int32 actorsCount = actors.size();
 	for (AActor* actor : actors)
@@ -71,158 +74,57 @@ void ESP_DEBUG(float mDist, ImVec4 color, UClass* mEntType)
 	}
 }
 
-void DrawUActorComponent(SDK::TArray<SDK::UActorComponent*> Comps,ImColor color)
+//	should only be called from a GUI thread with ImGui context
+void DrawUActorComponent(TArray<UActorComponent*> Comps,ImColor color)
 {
 	ImGui::GetBackgroundDrawList()->AddText(nullptr, 16, ImVec2(ImGui::GetIO().DisplaySize.x / 2, ImGui::GetIO().DisplaySize.y / 2), color, "Drawing...");
-	if (Comps.IsValid())
+	if (!Comps.IsValid())
+		return; 
+	for (int i = 0; i < Comps.Count(); i++)
 	{
-		for (int i = 0; i < Comps.Count(); i++)
-		{
-			
-			if (Comps[i] != NULL)
-			{
-				
-				ImGui::GetBackgroundDrawList()->AddText(nullptr, 16, ImVec2(10, 10 + (i * 30)), color, Comps[i]->GetFullName().c_str());
-			}
-		}
+		
+		if (!Comps[i])
+			continue;
+
+		ImGui::GetBackgroundDrawList()->AddText(nullptr, 16, ImVec2(10, 10 + (i * 30)), color, Comps[i]->GetFullName().c_str());
 	}
 }
 
-void UnlockAllEffigies() {
-	SDK::APalPlayerCharacter* pPalCharacter = Config.GetPalPlayerCharacter();
-	if (!pPalCharacter)
+//	credit: 
+void UnlockAllEffigies() 
+{
+	APalPlayerCharacter* pPalCharacter = Config.GetPalPlayerCharacter();
+	APalPlayerState* pPalPlayerState = Config.GetPalPlayerState();
+	if (!pPalCharacter || !pPalPlayerState)
 		return;
 
-	SDK::UWorld* world = Config.GetUWorld();
+	UWorld* world = Config.GetUWorld();
 	if (!world)
 		return;
 
-	SDK::TUObjectArray* objects = world->GObjects;
+	TUObjectArray* objects = world->GObjects;
 
-	for (int i = 0; i < objects->NumElements; ++i) {
-		SDK::UObject* object = objects->GetByIndex(i);
+	for (int i = 0; i < objects->NumElements; ++i) 
+	{
+		UObject* object = objects->GetByIndex(i);
 
-		if (!object) {
+		if (!object)
 			continue;
-		}
 
-		if (!object->IsA(SDK::APalLevelObjectRelic::StaticClass())) {
+		if (!object->IsA(APalLevelObjectRelic::StaticClass()))
 			continue;
-		}
 
-		SDK::APalLevelObjectObtainable* relic = (SDK::APalLevelObjectObtainable*)object;
+		APalLevelObjectObtainable* relic = (APalLevelObjectObtainable*)object;
 		if (!relic) {
 			continue;
 		}
 
-		((SDK::APalPlayerState*)pPalCharacter->PlayerState)->RequestObtainLevelObject_ToServer(relic);
+		pPalPlayerState->RequestObtainLevelObject_ToServer(relic);
 	}
 }
 
-void ResetStamina()
-{
-	APalPlayerCharacter* pPalCharacter = Config.GetPalPlayerCharacter();
-	if (!pPalCharacter)
-		return;
-
-	UPalCharacterParameterComponent* pParams = pPalCharacter->CharacterParameterComponent;
-	if (!pParams)
-		return;
-
-	pParams->ResetSP();
-}
-
-void SetInfiniteAmmo(bool bInfAmmo)
-{
-	APalPlayerCharacter* pPalCharacter = Config.GetPalPlayerCharacter();
-	if (!pPalCharacter)
-		return;
-
-	UPalShooterComponent* pShootComponent = pPalCharacter->ShooterComponent;
-	if (!pShootComponent)
-		return;
-
-	APalWeaponBase* pWeapon = pShootComponent->HasWeapon;
-	if (pWeapon)
-		pWeapon->IsRequiredBullet = bInfAmmo ? false : true;
-
-}
-
-void SetCraftingSpeed(float mNewSpeed, bool bRestoreDefault)
-{
-	APalPlayerCharacter* pPalCharacter = Config.GetPalPlayerCharacter();
-	if (!pPalCharacter)
-		return;
-
-	UPalCharacterParameterComponent* pParams = pPalCharacter->CharacterParameterComponent;
-	if (!pParams)
-		return;
-
-	UPalIndividualCharacterParameter* ivParams = pParams->IndividualParameter;
-	if (!ivParams)
-		return;
-
-	FPalIndividualCharacterSaveParameter sParams = ivParams->SaveParameter;
-	TArray<FFloatContainer_FloatPair> mCraftSpeedArray = sParams.CraftSpeedRates.Values;
-
-	if (mCraftSpeedArray.Count() > 0)
-		mCraftSpeedArray[0].Value = bRestoreDefault ? 1.0f : mNewSpeed;
-}
-
-void AddTechPoints(__int32 mPoints)
-{
-	APalPlayerState* mPlayerState = Config.GetPalPlayerState();
-	if (!mPlayerState)
-		return;
-
-	UPalTechnologyData* pTechData = mPlayerState->TechnologyData;
-	if (!pTechData)
-		return;
-
-	pTechData->TechnologyPoint += mPoints;
-}
-
-void AddAncientTechPoints(__int32 mPoints)
-{
-	APalPlayerState* mPlayerState = Config.GetPalPlayerState();
-	if (!mPlayerState)
-		return;
-
-	UPalTechnologyData* pTechData = mPlayerState->TechnologyData;
-	if (!pTechData)
-		return;
-
-	pTechData->bossTechnologyPoint += mPoints;
-}
-
-void RemoveTechPoints(__int32 mPoints)
-{
-	APalPlayerState* mPlayerState = Config.GetPalPlayerState();
-	if (!mPlayerState)
-		return;
-
-	UPalTechnologyData* pTechData = mPlayerState->TechnologyData;
-	if (!pTechData)
-		return;
-
-	pTechData->TechnologyPoint -= mPoints;
-}
-
-void RemoveAncientTechPoint(__int32 mPoints)
-{
-	APalPlayerState* mPlayerState = Config.GetPalPlayerState();
-	if (!mPlayerState)
-		return;
-
-	UPalTechnologyData* pTechData = mPlayerState->TechnologyData;
-	if (!pTechData)
-		return;
-
-	pTechData->bossTechnologyPoint -= mPoints;
-}
-
 //	Credit: BennettStaley
-void AddToInventoryContainer(__int32 mCount, __int32 mIndex)
+void IncrementInventoryItemCountByIndex(__int32 mCount, __int32 mIndex)
 {
 	APalPlayerCharacter* p_appc = Config.GetPalPlayerCharacter();
 	if (!p_appc != NULL)
@@ -258,3 +160,332 @@ void AddToInventoryContainer(__int32 mCount, __int32 mIndex)
 	__int32 mNewCount = StackCount += mCount;
 	InventoryData->RequestAddItem(FirstItemId.StaticId, mNewCount, true);
 }
+
+//	
+void AddItemToInventoryByName(UPalPlayerInventoryData* data, char* itemName, int count)
+{
+	// obtain lib instance
+	static UKismetStringLibrary* lib = UKismetStringLibrary::GetDefaultObj();
+
+	// Convert FNAME
+	wchar_t  ws[255];
+	swprintf(ws, 255, L"%hs", itemName);
+	FName Name = lib->Conv_StringToName(FString(ws));
+
+	// Call
+	data->RequestAddItem(Name, count, true);
+}
+
+// Credit: asashi
+void SpawnMultiple_ItemsToInventory(config::QuickItemSet Set)
+{
+	SDK::UPalPlayerInventoryData* InventoryData = Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState()->GetInventoryData();
+	switch (Set)
+	{
+	case 0:
+		for (int i = 0; i < IM_ARRAYSIZE(database::basic_items_stackable); i++)
+			AddItemToInventoryByName(InventoryData, _strdup(database::basic_items_stackable[i].c_str()), 100);
+		break;
+	case 1:
+		for (int i = 0; i < IM_ARRAYSIZE(database::basic_items_single); i++)
+			AddItemToInventoryByName(InventoryData, _strdup(database::basic_items_single[i].c_str()), 1);
+		break;
+	case 2:
+		for (int i = 0; i < IM_ARRAYSIZE(database::pal_unlock_skills); i++)
+			AddItemToInventoryByName(InventoryData, _strdup(database::pal_unlock_skills[i].c_str()), 1);
+		break;
+	case 3:
+		for (int i = 0; i < IM_ARRAYSIZE(database::spheres); i++)
+			AddItemToInventoryByName(InventoryData, _strdup(database::spheres[i].c_str()), 100);
+		break;
+	case 4:
+		for (int i = 0; i < IM_ARRAYSIZE(database::tools); i++)
+			AddItemToInventoryByName(InventoryData, _strdup(database::tools[i].c_str()), 1);
+		break;
+	default:
+		break;
+	}
+}
+
+//	
+void AnyWhereTP(FVector& vector, bool IsSafe)
+{
+	APalPlayerState* pPalPlayerState = Config.GetPalPlayerState();
+	APalPlayerController* pPalPlayerController = Config.GetPalPlayerController();
+	if (!pPalPlayerController || !pPalPlayerState)
+		return;
+
+	vector = { vector.X,vector.Y + 100,vector.Z };
+	FGuid guid = pPalPlayerController->GetPlayerUId();
+	pPalPlayerController->Transmitter->Player->RegisterRespawnLocation_ToServer(guid, vector);
+	pPalPlayerState->RequestRespawn();
+}
+
+//	
+void ExploitFly(bool IsFly)
+{
+	SDK::APalPlayerCharacter* pPalPlayerCharacter = Config.GetPalPlayerCharacter();
+	if (!pPalPlayerCharacter)
+		return;
+
+	APalPlayerController* pPalPlayerController = pPalPlayerCharacter->GetPalPlayerController();
+	if (!pPalPlayerController)
+		return;
+
+	IsFly ? pPalPlayerController->StartFlyToServer() : pPalPlayerController->EndFlyToServer();
+}
+
+//	
+void SpeedHack(float mSpeed)
+{
+	UWorld* pWorld = Config.gWorld;
+	if (!pWorld)
+		return;
+
+	AWorldSettings* pWorldSettings = pWorld->K2_GetWorldSettings();
+	if (!pWorldSettings)
+		return;
+
+	pWorldSettings->TimeDilation = mSpeed;
+}
+
+//	
+void SetDemiGodMode(bool bIsSet)
+{
+	auto pCharacter = Config.GetPalPlayerCharacter();
+	if (!pCharacter)
+		return;
+
+	auto pParams = pCharacter->CharacterParameterComponent;
+	if (!pParams)
+		return;
+
+	auto mIVs = pParams->IndividualParameter;
+	if (!mIVs)
+		return;
+
+	auto sParams = mIVs->SaveParameter;
+
+	pParams->bIsEnableMuteki = bIsSet;	//	Credit: Mokobake
+	if (!bIsSet)
+		return;
+
+	//	attempt additional parameters
+	sParams.HP.Value = sParams.MaxHP.Value;
+	sParams.MP.Value = sParams.MaxMP.Value;
+	sParams.FullStomach = sParams.MaxFullStomach;
+	sParams.PhysicalHealth = EPalStatusPhysicalHealthType::Healthful;
+	sParams.SanityValue = 100.f;
+	sParams.HungerType = EPalStatusHungerType::Default;
+}
+
+//	
+void RespawnLocalPlayer(bool bIsSafe)
+{
+	APalPlayerController* pPalPlayerController = Config.GetPalPlayerController();
+	APalPlayerState* pPalPlayerState = Config.GetPalPlayerState();
+	if (!pPalPlayerController || !pPalPlayerState)
+		return;
+
+	bIsSafe ? pPalPlayerController->TeleportToSafePoint_ToServer() : pPalPlayerState->RequestRespawn();
+}
+
+//	
+void ReviveLocalPlayer()
+{
+	APalPlayerCharacter* pPalPlayerCharacter = Config.GetPalPlayerCharacter();
+	if (!pPalPlayerCharacter)
+		return;
+
+	FFixedPoint newHealthPoint = FFixedPoint(99999999);
+	pPalPlayerCharacter->ReviveCharacter_ToServer(newHealthPoint);
+
+}
+
+//	
+void ResetStamina()
+{
+	APalPlayerCharacter* pPalCharacter = Config.GetPalPlayerCharacter();
+	if (!pPalCharacter)
+		return;
+
+	UPalCharacterParameterComponent* pParams = pPalCharacter->CharacterParameterComponent;
+	if (!pParams)
+		return;
+
+	pParams->ResetSP();
+}
+
+//	
+void GiveExperiencePoints(__int32 mXP)
+{
+	auto pPalPlayerState = Config.GetPalPlayerState();
+	if (!pPalPlayerState)
+		return;
+
+	pPalPlayerState->GrantExpForParty(mXP);
+}
+
+//	
+void SetPlayerAttackParam(__int32 mNewAtk)
+{
+	APalPlayerCharacter* pPalPlayerCharacter = Config.GetPalPlayerCharacter();
+	if (!pPalPlayerCharacter)
+		return;
+
+	UPalCharacterParameterComponent* pParams = pPalPlayerCharacter->CharacterParameterComponent;
+	if (!pParams)
+		return;
+
+	if (pParams->AttackUp != mNewAtk)
+		pParams->AttackUp = mNewAtk;
+}
+
+//	
+void SetPlayerDefenseParam(__int32 mNewDef)
+{
+	APalPlayerCharacter* pPalPlayerCharacter = Config.GetPalPlayerCharacter();
+	if (!pPalPlayerCharacter)
+		return;
+
+	UPalCharacterParameterComponent* pParams = pPalPlayerCharacter->CharacterParameterComponent;
+	if (!pParams)
+		return;
+	
+	if (pParams->DefenseUp != mNewDef)
+		pParams->DefenseUp = mNewDef;
+}
+
+//	
+void SetInfiniteAmmo(bool bInfAmmo)
+{
+	APalPlayerCharacter* pPalCharacter = Config.GetPalPlayerCharacter();
+	if (!pPalCharacter)
+		return;
+
+	UPalShooterComponent* pShootComponent = pPalCharacter->ShooterComponent;
+	if (!pShootComponent)
+		return;
+
+	APalWeaponBase* pWeapon = pShootComponent->HasWeapon;
+	if (pWeapon)
+		pWeapon->IsRequiredBullet = bInfAmmo ? false : true;
+
+}
+
+//	
+void SetCraftingSpeed(float mNewSpeed, bool bRestoreDefault)
+{
+	APalPlayerCharacter* pPalCharacter = Config.GetPalPlayerCharacter();
+	if (!pPalCharacter)
+		return;
+
+	UPalCharacterParameterComponent* pParams = pPalCharacter->CharacterParameterComponent;
+	if (!pParams)
+		return;
+
+	UPalIndividualCharacterParameter* ivParams = pParams->IndividualParameter;
+	if (!ivParams)
+		return;
+
+	FPalIndividualCharacterSaveParameter sParams = ivParams->SaveParameter;
+	TArray<FFloatContainer_FloatPair> mCraftSpeedArray = sParams.CraftSpeedRates.Values;
+
+	if (mCraftSpeedArray.Count() > 0)
+		mCraftSpeedArray[0].Value = bRestoreDefault ? 1.0f : mNewSpeed;
+}
+
+//	
+void AddTechPoints(__int32 mPoints)
+{
+	APalPlayerState* mPlayerState = Config.GetPalPlayerState();
+	if (!mPlayerState)
+		return;
+
+	UPalTechnologyData* pTechData = mPlayerState->TechnologyData;
+	if (!pTechData)
+		return;
+
+	pTechData->TechnologyPoint += mPoints;
+}
+
+//	
+void AddAncientTechPoints(__int32 mPoints)
+{
+	APalPlayerState* mPlayerState = Config.GetPalPlayerState();
+	if (!mPlayerState)
+		return;
+
+	UPalTechnologyData* pTechData = mPlayerState->TechnologyData;
+	if (!pTechData)
+		return;
+
+	pTechData->bossTechnologyPoint += mPoints;
+}
+
+//	
+void RemoveTechPoints(__int32 mPoints)
+{
+	APalPlayerState* mPlayerState = Config.GetPalPlayerState();
+	if (!mPlayerState)
+		return;
+
+	UPalTechnologyData* pTechData = mPlayerState->TechnologyData;
+	if (!pTechData)
+		return;
+
+	pTechData->TechnologyPoint -= mPoints;
+}
+
+//	
+void RemoveAncientTechPoint(__int32 mPoints)
+{
+	APalPlayerState* mPlayerState = Config.GetPalPlayerState();
+	if (!mPlayerState)
+		return;
+
+	UPalTechnologyData* pTechData = mPlayerState->TechnologyData;
+	if (!pTechData)
+		return;
+
+	pTechData->bossTechnologyPoint -= mPoints;
+}
+
+
+///	OLDER METHODS
+//SDK::FPalDebugOtomoPalInfo palinfo = SDK::FPalDebugOtomoPalInfo();
+//SDK::TArray<SDK::EPalWazaID> EA = { 0U };
+//void SpawnPal(char* PalName, bool IsMonster, int rank=1, int lvl = 1, int count=1)
+//{
+//    SDK::UKismetStringLibrary* lib = SDK::UKismetStringLibrary::GetDefaultObj();
+//
+//    //Convert FNAME
+//    wchar_t  ws[255];
+//    swprintf(ws, 255, L"%hs", PalName);
+//    SDK::FName Name = lib->Conv_StringToName(SDK::FString(ws));
+//    //Call
+//    if (Config.GetPalPlayerCharacter() != NULL)
+//    {
+//        if (Config.GetPalPlayerCharacter()->GetPalPlayerController() != NULL)
+//        {
+//            if (Config.GetPalPlayerCharacter()->GetPalPlayerController())
+//            {
+//                if (Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState())
+//                {
+//                    if (IsMonster)
+//                    {
+//                        Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState()->RequestSpawnMonsterForPlayer(Name, count, lvl);
+//                        return;
+//                    }
+//                    EA[0] = SDK::EPalWazaID::AirCanon;
+//                    palinfo.Level = lvl;
+//                    palinfo.Rank = rank;
+//                    palinfo.PalName.Key = Name;
+//                    palinfo.WazaList = EA;
+//                    palinfo.PassiveSkill = NULL;
+//                    Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState()->Debug_CaptureNewMonsterByDebugOtomoInfo_ToServer(palinfo);
+//                }
+//            }
+//        }
+//    }
+//}
