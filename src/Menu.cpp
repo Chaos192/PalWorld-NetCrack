@@ -84,6 +84,8 @@ namespace DX11_Base
 
             ImGui::Checkbox("InfStamina", &Config.IsInfStamina);
 
+            if (ImGui::Checkbox("FullBright", &Config.IsFullbright))
+                SetFullbright(Config.IsFullbright);
 
             if (ImGui::Button("RandomName", ImVec2(ImGui::GetContentRegionAvail().x - 3, 20)))
             {

@@ -31,4 +31,7 @@
 // MINHOOK
 #include "libs/MinHook/MinHook.h"
 
+//	SDK ( shit takes way to long to compile , now a static library )
+#include <SDK.hpp>
+
 #endif //PCH_H
