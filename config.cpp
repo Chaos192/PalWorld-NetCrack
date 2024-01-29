@@ -69,6 +69,15 @@ SDK::APalPlayerCharacter* config::GetPalPlayerCharacter()
     return nullptr;
 }
 
+SDK::APalPlayerController* config::GetPalPlayerController()
+{
+    SDK::APalPlayerCharacter* pPlayer = GetPalPlayerCharacter();
+    if (!pPlayer)
+        return nullptr;
+
+    return static_cast<SDK::APalPlayerController*>(pPlayer->GetPalPlayerController());
+}
+
 SDK::APalPlayerState* config::GetPalPlayerState()
 {
     SDK::APalPlayerCharacter* pPlayer = GetPalPlayerCharacter();
@@ -191,6 +200,10 @@ void config::Init()
 {
     //register hook
     Config.ClientBase = (DWORD64)GetModuleHandleA("PalWorld-Win64-Shipping.exe");
+
+    SDK::InitGObjects();
+
+    Config.gWorld = Config.GetUWorld();
 
     TickFunc = (Tick)(Config.ClientBase + Config.offset_Tick);
 

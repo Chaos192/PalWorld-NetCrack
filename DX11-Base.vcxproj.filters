@@ -25,6 +25,9 @@
     <Filter Include="Resource Files\MinHook">
       <UniqueIdentifier>{d55590e2-04e5-427a-a959-6dcc763f2f71}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\SDK">
+      <UniqueIdentifier>{26987ebc-44ae-4b58-be8f-b68ad7efa763}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -108,9 +111,6 @@
     <ClInclude Include="config.h">
       <Filter>Header Files\Class</Filter>
     </ClInclude>
-    <ClInclude Include="SDK.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="libs\utils\memory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -119,6 +119,9 @@
     </ClInclude>
     <ClInclude Include="database.h">
       <Filter>Header Files\Class</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK.hpp">
+      <Filter>Resource Files\SDK</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -185,12 +188,6 @@
     <ClCompile Include="config.cpp">
       <Filter>Source Files\Class</Filter>
     </ClCompile>
-    <ClCompile Include="SDK\Basic.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SDK\CoreUObject_functions.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="libs\utils\memory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -198,10 +195,16 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SDK\Pal_functions.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Resource Files\SDK</Filter>
     </ClCompile>
     <ClCompile Include="SDK\Engine_functions.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Resource Files\SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\CoreUObject_functions.cpp">
+      <Filter>Resource Files\SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Basic.cpp">
+      <Filter>Resource Files\SDK</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

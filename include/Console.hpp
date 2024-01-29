@@ -2,27 +2,30 @@
 #include "helper.h"
 
 namespace DX11_Base {
-	struct Colors {
-		int dark_blue = 1;
-		int dark_green = 2;
-		int dark_teal = 3;
-		int dark_red = 4;
-		int dark_pink = 5;
-		int dark_yellow = 6;
-		int dark_white = 7;
-		int dark_gray = 8;
-		int blue = 9;
-		int green = 10;
-		int teal = 11;
-		int red = 12;
-		int pink = 13;
-		int yellow = 14;
-		int white = 15;
-		int DEFAULT = 15;
-	};
 
 	class Console
 	{
+	public:
+		enum Colors
+		{
+			dark_blue = 1,
+			dark_green,
+			dark_teal,
+			dark_red,
+			dark_pink,
+			dark_yellow,
+			dark_white,
+			dark_gray,
+			blue,
+			green,
+			teal,
+			red,
+			pink,
+			yellow ,
+			white,
+			DEFAULT = white,
+		};
+		
 	public:
 		FILE* stream_in{};
 		FILE* stream_out{};

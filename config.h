@@ -64,7 +64,8 @@ public:
 	//static function
 	static SDK::UWorld* GetUWorld();
 	static SDK::UPalCharacterImportanceManager* GetCharacterImpManager();
-	static SDK::APalPlayerCharacter* GetPalPlayerCharacter();
+	static SDK::APalPlayerCharacter* GetPalPlayerCharacter(); 
+	static SDK::APalPlayerController* GetPalPlayerController();
 	static SDK::APalPlayerState* GetPalPlayerState();
 	static SDK::UPalPlayerInventoryData* GetInventoryComponent();
 	static SDK::APalWeaponBase* GetPlayerEquippedWeapon();

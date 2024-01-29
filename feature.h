@@ -5,15 +5,37 @@
 
 void ESP();
 
-void ESP_DEBUG(float mDist, ImVec4 color, SDK::UClass* mEntType = SDK::AActor::StaticClass());
+void ESP_DEBUG(float mDist, ImVec4 color = { 1.0f, 0.0f, 0.0f, 01.0f }, SDK::UClass* mEntType = SDK::AActor::StaticClass());
 
 void DrawUActorComponent(SDK::TArray<SDK::UActorComponent*> Comps, ImColor color);
 
 void UnlockAllEffigies();
 
-void AddToInventoryContainer(__int32 mCount, __int32 mIndex = 0);
+void IncrementInventoryItemCountByIndex(__int32 mCount, __int32 mIndex = 0);
+
+void AddItemToInventoryByName(SDK::UPalPlayerInventoryData* data, char* itemName, int count);
+
+void SpawnMultiple_ItemsToInventory(config::QuickItemSet Set);
+
+void AnyWhereTP(SDK::FVector& vector, bool IsSafe);
+
+void ExploitFly(bool IsFly);
+
+void SpeedHack(float mSpeed);
+
+void SetDemiGodMode(bool bIsSet);
+
+void RespawnLocalPlayer(bool bIsSafe);
+
+void ReviveLocalPlayer();
 
 void ResetStamina();
+
+void GiveExperiencePoints(__int32 mXP);
+
+void SetPlayerAttackParam(__int32 mNewAtk);
+
+void SetPlayerDefenseParam(__int32 mNewDef);
 
 void SetInfiniteAmmo(bool bInfAmmo);
 
@@ -26,3 +48,5 @@ void AddAncientTechPoints(__int32 mPoints);
 void RemoveTechPoints(__int32 mPoints);
 
 void RemoveAncientTechPoint(__int32 mPoints);
+
+float GetDistanceToActor(SDK::AActor* pLocal, SDK::AActor* pTarget);
