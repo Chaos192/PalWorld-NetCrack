@@ -25,9 +25,6 @@
     <Filter Include="Resource Files\MinHook">
       <UniqueIdentifier>{d55590e2-04e5-427a-a959-6dcc763f2f71}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files\SDK">
-      <UniqueIdentifier>{26987ebc-44ae-4b58-be8f-b68ad7efa763}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -120,9 +117,6 @@
     <ClInclude Include="database.h">
       <Filter>Header Files\Class</Filter>
     </ClInclude>
-    <ClInclude Include="SDK.hpp">
-      <Filter>Resource Files\SDK</Filter>
-    </ClInclude>
     <ClInclude Include="ItemList.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -196,18 +190,6 @@
     </ClCompile>
     <ClCompile Include="feature.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SDK\Pal_functions.cpp">
-      <Filter>Resource Files\SDK</Filter>
-    </ClCompile>
-    <ClCompile Include="SDK\Engine_functions.cpp">
-      <Filter>Resource Files\SDK</Filter>
-    </ClCompile>
-    <ClCompile Include="SDK\CoreUObject_functions.cpp">
-      <Filter>Resource Files\SDK</Filter>
-    </ClCompile>
-    <ClCompile Include="SDK\Basic.cpp">
-      <Filter>Resource Files\SDK</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

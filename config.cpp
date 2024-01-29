@@ -61,6 +61,19 @@ SDK::UPalCharacterImportanceManager* config::GetCharacterImpManager()
     return static_cast<SDK::UPalGameInstance*>(pGameInstance)->CharacterImportanceManager;
 }
 
+SDK::ULocalPlayer* config::GetLocalPlayer()
+{
+    SDK::UWorld* pWorld = Config.gWorld;
+    if (!pWorld)
+        return nullptr;
+
+    SDK::UGameInstance* pGameInstance = pWorld->OwningGameInstance;
+    if (!pGameInstance)
+        return nullptr;
+    
+    return pGameInstance->LocalPlayers[0];
+}
+
 SDK::APalPlayerCharacter* config::GetPalPlayerCharacter()
 {
 

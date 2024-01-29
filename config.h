@@ -1,7 +1,6 @@
 #pragma once
 #include <Windows.h>
 #include "libs/utils/memory.h"
-#include "SDK.hpp"
 #include "database.h"
 #include "ItemList.hpp"
 
@@ -15,6 +14,7 @@ public:
 	DWORD64 offset_Tick = 0x2AB1DC0;//APalPlayerCharacter::Tick
 	//check
 	bool IsESP = false;
+	bool IsFullbright = false;
 	bool IsAimbot = false;
 	bool IsSpeedHack = false;
 	bool IsAttackModiler = false;
@@ -65,6 +65,7 @@ public:
 	//static function
 	static SDK::UWorld* GetUWorld();
 	static SDK::UPalCharacterImportanceManager* GetCharacterImpManager();
+	static SDK::ULocalPlayer* GetLocalPlayer();
 	static SDK::APalPlayerCharacter* GetPalPlayerCharacter(); 
 	static SDK::APalPlayerController* GetPalPlayerController();
 	static SDK::APalPlayerState* GetPalPlayerState();
