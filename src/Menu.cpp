@@ -777,7 +777,7 @@ namespace DX11_Base
             TeleportAllPalsToCrosshair(Config.mDebugEntCapDistance);
 
         if (Config.IsDeathAura)
-            DeathAura(Config.mDeathAuraAmount, Config.mDeathAuraDistance);
+            DeathAura(Config.mDeathAuraAmount, Config.mDeathAuraDistance, true);
         //  
         //  SetDemiGodMode(Config.IsMuteki);
     }

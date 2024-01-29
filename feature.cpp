@@ -556,6 +556,14 @@ void SendDamageToActor(APalCharacter* pTarget, int32 damage, bool bSpoofAttacker
 void DeathAura(__int32 dmgAmount, float mDistance, bool bIntensityEffect, bool bVisualAffect, EPalVisualEffectID visID)
 {
 	APalCharacter* pPalCharacter = Config.GetPalPlayerCharacter();
+	if (!pPalCharacter)
+		return;
+
+	UPalCharacterParameterComponent* pParams = pPalCharacter->CharacterParameterComponent;
+	if (!pParams)
+		return;
+
+	APalCharacter* pPlayerPal = pParams->OtomoPal;
 
 	TArray<APalCharacter*> outPals;
 	if (!Config.GetTAllPals(&outPals))
@@ -566,7 +574,7 @@ void DeathAura(__int32 dmgAmount, float mDistance, bool bIntensityEffect, bool b
 	{
 		APalCharacter* cEnt = outPals[i];
 		
-		if (!cEnt || !cEnt->IsA(APalMonsterCharacter::StaticClass()))
+		if (!cEnt || !cEnt->IsA(APalMonsterCharacter::StaticClass()) || cEnt == pPlayerPal)
 			continue;
 
 		float distanceTo = GetDistanceToActor(pPalCharacter, cEnt);
@@ -581,7 +589,8 @@ void DeathAura(__int32 dmgAmount, float mDistance, bool bIntensityEffect, bool b
 		if (bVisualAffect && pVisComp)
 		{
 			FPalVisualEffectDynamicParameter fvedp;
-			pVisComp->AddVisualEffect_ToServer(visID, fvedp, 1);	//	uc: killer1478
+			if (!pVisComp->ExecutionVisualEffects.Count())
+				pVisComp->AddVisualEffect_ToServer(visID, fvedp, 1);	//	uc: killer1478
 		}
 		SendDamageToActor(cEnt, dmgAmount);
 	}
