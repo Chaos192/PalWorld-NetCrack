@@ -3,6 +3,7 @@
 #include "libs/utils/memory.h"
 #include "SDK.hpp"
 #include "database.h"
+#include "ItemList.hpp"
 
 typedef bool(*Tick)(SDK::APalPlayerCharacter* m_this, float DeltaSecond);
 

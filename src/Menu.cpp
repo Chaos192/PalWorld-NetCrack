@@ -2,6 +2,7 @@
 #include "../include/Menu.hpp"
 #include "SDK.hpp"
 #include "config.h"
+#include <algorithm>
 std::string rand_str(const int len)
 {
     std::string str;
@@ -251,6 +252,105 @@ namespace DX11_Base
             }
         }
 
+        void TABItemSpawner()
+        {
+            static int num_to_add = 1;
+            static int category = 0;
+
+            ImGui::InputInt("Num To Add", &num_to_add);
+
+            ImGui::Combo("Item Category", &category, "Accessories\0Ammo\0Armor\0Crafting Materials\0Eggs\0Food\0Hats\0\Medicine\0Money\0Other\0Pal Spheres\0Seeds\0Tools\0Weapons\0");
+
+            std::initializer_list list = itemlist::accessories;
+
+            switch (category)
+            {
+                case 1:
+                    list = itemlist::ammo;
+                    break;
+                case 2:
+                    list = itemlist::armor;
+                    break;
+                case 3:
+                    list = itemlist::craftingmaterials;
+                    break;
+                case 4:
+                    list = itemlist::eggs;
+                    break;
+                case 5:
+                    list = itemlist::food;
+                    break;
+                case 6:
+                    list = itemlist::hats;
+                    break;
+                case 7:
+                    list = itemlist::medicine;
+                    break;
+                case 8:
+                    list = itemlist::money;
+                    break;
+                case 9:
+                    list = itemlist::other;
+                    break;
+                case 10:
+                    list = itemlist::palspheres;
+                    break;
+                case 11:
+                    list = itemlist::seeds;
+                    break;
+                case 12:
+                    list = itemlist::tools;
+                    break;
+                case 13:
+                    list = itemlist::weapons;
+                    break;
+                default:
+                    list = itemlist::accessories;
+            }
+
+            int cur_size = 0;
+
+            static char item_search[100];
+
+            ImGui::InputText("Search", item_search, IM_ARRAYSIZE(item_search));
+
+            for (const auto& item : list) {
+                std::istringstream ss(item);
+                std::string left_text, right_text;
+
+                std::getline(ss, left_text, '|');
+                std::getline(ss, right_text);
+
+                auto right_to_lower = right_text;
+                std::string item_search_to_lower = item_search;
+
+                std::transform(right_to_lower.begin(), right_to_lower.end(), right_to_lower.begin(), ::tolower);
+                std::transform(item_search_to_lower.begin(), item_search_to_lower.end(), item_search_to_lower.begin(), ::tolower);
+
+                if (item_search[0] != '\0' && (right_to_lower.find(item_search_to_lower) == std::string::npos))
+                    continue;
+
+                if (cur_size != 0 && cur_size < 20)
+                {
+                    ImGui::SameLine();
+                }
+                else if (cur_size != 0)
+                {
+                    cur_size = 0;
+                }
+
+                cur_size += right_text.length();
+
+                ImGui::PushID(item);
+                if (ImGui::Button(right_text.c_str()))
+                {
+                    SDK::UPalPlayerInventoryData* InventoryData = Config.GetPalPlayerCharacter()->GetPalPlayerController()->GetPalPlayerState()->GetInventoryData();
+                    AddItemToInventoryByName(InventoryData, (char*)left_text.c_str(), num_to_add);
+                }
+                ImGui::PopID();
+            }
+        }
+
         void TABQuick()
         {
             if (ImGui::Button("Basic Items stack", ImVec2(ImGui::GetContentRegionAvail().x - 3, 20)))
@@ -490,6 +590,11 @@ namespace DX11_Base
             if (ImGui::BeginTabItem("Database"))
             {
                 Tabs::TABDatabase();
+                ImGui::EndTabItem();
+            }
+            if (ImGui::BeginTabItem("Item Spawner"))
+            {
+                Tabs::TABItemSpawner();
                 ImGui::EndTabItem();
             }
             if (ImGui::BeginTabItem("CONFIG"))
