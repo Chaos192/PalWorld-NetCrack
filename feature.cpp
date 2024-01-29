@@ -532,7 +532,7 @@ void ForgeActor(SDK::AActor* pTarget, float mDistance, float mHeight, float mAng
 }
 
 //	credit: 
-void SendDamageToActor(APalCharacter* character, int32 damage, bool bSpoofAttacker)
+void SendDamageToActor(APalCharacter* pTarget, int32 damage, bool bSpoofAttacker)
 {
 	APalPlayerState* pPalPlayerState = Config.GetPalPlayerState();
 	APalPlayerCharacter* pPalPlayerCharacter = Config.GetPalPlayerCharacter();
@@ -549,7 +549,42 @@ void SendDamageToActor(APalCharacter* character, int32 damage, bool bSpoofAttack
 	info.bAttackableToFriend = true;
 	info.IgnoreShield = true;
 	info.NativeDamageValue = damage;
-	pPalPlayerState->SendDamage_ToServer(character, info);
+	pPalPlayerState->SendDamage_ToServer(pTarget, info);
+}
+
+//	 NOTE: only targets pals
+void DeathAura(__int32 dmgAmount, float mDistance, bool bIntensityEffect, bool bVisualAffect, EPalVisualEffectID visID)
+{
+	APalCharacter* pPalCharacter = Config.GetPalPlayerCharacter();
+
+	TArray<APalCharacter*> outPals;
+	if (!Config.GetTAllPals(&outPals))
+		return;
+
+	DWORD palsCount = outPals.Count();
+	for (auto i = 0; i < palsCount; i++)
+	{
+		APalCharacter* cEnt = outPals[i];
+		
+		if (!cEnt || !cEnt->IsA(APalMonsterCharacter::StaticClass()))
+			continue;
+
+		float distanceTo = GetDistanceToActor(pPalCharacter, cEnt);
+		if (distanceTo > mDistance)
+			continue;
+
+		float dmgScalar = dmgAmount * (1.0f - distanceTo / mDistance);
+		if (bIntensityEffect)
+			dmgAmount = dmgScalar;
+
+		UPalVisualEffectComponent* pVisComp = cEnt->VisualEffectComponent;
+		if (bVisualAffect && pVisComp)
+		{
+			FPalVisualEffectDynamicParameter fvedp;
+			pVisComp->AddVisualEffect_ToServer(visID, fvedp, 1);	//	uc: killer1478
+		}
+		SendDamageToActor(cEnt, dmgAmount);
+	}
 }
 
 // credit: xCENTx

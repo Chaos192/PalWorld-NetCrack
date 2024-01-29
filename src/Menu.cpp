@@ -361,27 +361,61 @@ namespace DX11_Base
         
         void TABDebug()
         {
-            ImGui::Checkbox("DEBUG ESP", &Config.isDebugESP);
+            if (ImGui::Checkbox("DEBUG ESP", &Config.isDebugESP) && !Config.isDebugESP)
+                Config.mDebugESPDistance = 10.f;
             if (Config.isDebugESP)
             {
                 ImGui::SameLine();
                 ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
                 ImGui::SliderFloat("##DISTANCE", &Config.mDebugESPDistance, 1.0f, 100.f, "%.0f", ImGuiSliderFlags_AlwaysClamp);
             }
-            ImGui::Checkbox("TELEPORT PALS TO XHAIR", &Config.IsTeleportAllToXhair);
+
+            if (ImGui::Checkbox("TELEPORT PALS TO XHAIR", &Config.IsTeleportAllToXhair) && !Config.IsTeleportAllToXhair)
+                Config.mDebugEntCapDistance = 10.f;
             if (Config.IsTeleportAllToXhair)
             {
                 ImGui::SameLine();
                 ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
                 ImGui::SliderFloat("##ENT_CAP_DISTANCE", &Config.mDebugEntCapDistance, 1.0f, 100.f, "%.0f", ImGuiSliderFlags_AlwaysClamp);
             }
-
-            //  @TODO: print additional debug information
-            if (ImGui::Button("PrintPlayerAddr", ImVec2(ImGui::GetContentRegionAvail().x - 3, 20)))
+            
+            if (ImGui::Checkbox("DEATH AURA", &Config.IsDeathAura) && !Config.IsDeathAura)
             {
-                SDK::APalPlayerCharacter* p_appc = Config.GetPalPlayerCharacter();
-                if (p_appc)
-                    g_Console->printdbg("\n\n[+] APalPlayerCharacter: 0x%llX\n", Console::Colors::green, p_appc);
+                Config.mDeathAuraDistance = 10.0f;
+                Config.mDeathAuraAmount = 1;
+            }
+            if (Config.IsDeathAura)
+            {
+                ImGui::SameLine();
+                ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * .7);
+                ImGui::SliderFloat("##AURA_DISTANCE", &Config.mDeathAuraDistance, 1.0f, 100.f, "%.0f", ImGuiSliderFlags_AlwaysClamp);
+                ImGui::SameLine();
+                ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+                ImGui::SliderInt("##AURA_DMG", &Config.mDeathAuraAmount, 1, 10, "%d", ImGuiSliderFlags_AlwaysClamp);
+            }
+
+            if (ImGui::Button("PRINT ENGINE GLOBALS", ImVec2(ImGui::GetContentRegionAvail().x - 3, 20)))
+            {
+
+                g_Console->printdbg("[+] [UNREAL ENGINE GLOBALS]\n"
+                    "UWorld:\t\t\t0x%llX\n"
+                    "ULocalPlayer:\t\t0x%llX\n"
+                    "APalPlayerController:\t0x%llX\n"
+                    "APalPlayerCharacter:\t0x%llX\n"
+                    "APalPlayerState:\t0x%llX\n"
+                    "UCharacterImpMan:\t0x%llX\n"
+                    "UPalPlayerInventory:\t0x%llX\n"
+                    "APalWeaponBase:\t\t0x%llX\n",
+                    Console::Colors::yellow, 
+                    Config.gWorld,
+                    Config.GetLocalPlayer(),
+                    Config.GetPalPlayerController(),
+                    Config.GetPalPlayerCharacter(),
+                    Config.GetPalPlayerState(),
+                    Config.GetCharacterImpManager(),
+                    Config.GetInventoryComponent(),
+                    Config.GetPlayerEquippedWeapon()
+                );
                 
             }
 
@@ -742,6 +776,8 @@ namespace DX11_Base
         if (Config.IsTeleportAllToXhair)
             TeleportAllPalsToCrosshair(Config.mDebugEntCapDistance);
 
+        if (Config.IsDeathAura)
+            DeathAura(Config.mDeathAuraAmount, Config.mDeathAuraDistance);
         //  
         //  SetDemiGodMode(Config.IsMuteki);
     }

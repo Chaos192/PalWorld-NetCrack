@@ -17,6 +17,7 @@ public:
 	bool IsFullbright = false;
 	bool IsForgeMode = false;
 	bool IsTeleportAllToXhair = false;
+	bool IsDeathAura = false;
 	bool IsAimbot = false;
 	bool IsSpeedHack = false;
 	bool IsAttackModiler = false;
@@ -38,6 +39,8 @@ public:
 	//def and value
 	float mDebugESPDistance = 5.0f;
 	float mDebugEntCapDistance = 10.0f;
+	float mDeathAuraDistance = 10.f;
+	int mDeathAuraAmount = 1.f;
 	int DamageUp = 0;
 	int DefuseUp = 0;
 	int EXP = 0;
@@ -96,7 +99,8 @@ public:
 	static bool	GetTAllImpNPC(SDK::TArray<class SDK::APalCharacter*>* outResult);
 	static bool	GetTAllNPC(SDK::TArray<class SDK::APalCharacter*>* outResult);
 	static bool	GetTAllPals(SDK::TArray<class SDK::APalCharacter*>* outResult);
-	static bool GetPartyPals(std::vector<SDK::AActor*> outResult);
+	static bool GetPartyPals(std::vector<SDK::AActor*>* outResult);
+	static bool GetPlayerDeathChests(std::vector<SDK::FVector>* outLocations);
 	static bool GetAllActorsofType(SDK::UClass* mType, std::vector<SDK::AActor*>* outArray, bool bLoopAllLevels = false, bool bSkipLocalPlayer = false);
 	static void Init();
 	static void Update(const char* filterText);
