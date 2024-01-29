@@ -5,7 +5,7 @@
 
 void ESP();
 
-void ESP_DEBUG(float mDist, ImVec4 color = { 1.0f, 0.0f, 0.0f, 01.0f }, SDK::UClass* mEntType = SDK::AActor::StaticClass());
+void ESP_DEBUG(float mDist, ImVec4 color = { 1.0f, 1.0f, 1.0f, 01.0f }, SDK::UClass* mEntType = SDK::AActor::StaticClass());
 
 void DrawUActorComponent(SDK::TArray<SDK::UActorComponent*> Comps, ImColor color);
 
