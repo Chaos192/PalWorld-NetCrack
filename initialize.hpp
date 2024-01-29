@@ -7,14 +7,6 @@
 #include "include/D3D11Window.hpp"
 #include "include/Hooking.hpp"
 using namespace DX11_Base;
-void ClientBGThread()
-{
-    while (g_Running) {
-        g_Menu->Loops();
-        std::this_thread::sleep_for(1ms);
-        std::this_thread::yield();
-    }
-}
 
 DWORD WINAPI MainThread_Initialize()
 {
@@ -37,7 +29,6 @@ DWORD WINAPI MainThread_Initialize()
     g_Console->printdbg("Main::Initialized\nUWorld:\t0x%llX\n", Console::Colors::green, Config.gWorld);
 #endif
 
-    std::thread WCMUpdate(ClientBGThread);	//	Initialize Loops Thread
     ///  RENDER LOOP
     g_Running = TRUE;
     while (g_Running)
@@ -51,7 +42,6 @@ DWORD WINAPI MainThread_Initialize()
     }
 
     ///  EXIT
-    WCMUpdate.join();						//	Exit Loops Thread
     FreeLibraryAndExitThread(g_hModule, EXIT_SUCCESS);
     return EXIT_SUCCESS;
 }
