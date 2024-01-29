@@ -183,6 +183,12 @@ bool config::GetAllActorsofType(SDK::UClass* mType, std::vector<SDK::AActor*>* o
         if (!pLevelsArray.IsValidIndex(i))
             continue;
 
+        SDK::ULevel* pLevel = pLevelsArray[i];
+        if (!pLevel && bLoopAllLevels)
+            continue;
+        else if (!pLevel && !bLoopAllLevels)
+            break;
+
         SDK::TArray<SDK::AActor*> pActorsArray = pLevelsArray[i]->Actors;
         __int32 actorsCount = pActorsArray.Count();
 

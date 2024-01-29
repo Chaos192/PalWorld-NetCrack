@@ -660,7 +660,7 @@ namespace DX11_Base
             ESP();
 
         if (Config.isDebugESP)
-            ESP_DEBUG(Config.mDebugESPDistance, ImVec4(0, 1, 0, 1));
+            ESP_DEBUG(Config.mDebugESPDistance);
 
         ImGui::End();
 	}
