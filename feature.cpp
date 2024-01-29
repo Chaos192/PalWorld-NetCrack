@@ -531,6 +531,27 @@ void ForgeActor(SDK::AActor* pTarget, float mDistance, float mHeight, float mAng
 	pTarget->K2_SetActorRotation(targetRotation, true);
 }
 
+//	credit: 
+void SendDamageToActor(APalCharacter* character, int32 damage, bool bSpoofAttacker)
+{
+	APalPlayerState* pPalPlayerState = Config.GetPalPlayerState();
+	APalPlayerCharacter* pPalPlayerCharacter = Config.GetPalPlayerCharacter();
+	if (!pPalPlayerState || !pPalPlayerCharacter)
+		return;
+
+	FPalDamageInfo  info = FPalDamageInfo();
+	info.AttackElementType = EPalElementType::Normal;
+	info.Attacker = pPalPlayerCharacter;		//	@TODO: spoof attacker
+	info.AttackerGroupID = Config.GetPalPlayerState()->IndividualHandleId.PlayerUId;
+	info.AttackerLevel = 50;	
+	info.AttackType = EPalAttackType::Weapon;
+	info.bApplyNativeDamageValue = true;
+	info.bAttackableToFriend = true;
+	info.IgnoreShield = true;
+	info.NativeDamageValue = damage;
+	pPalPlayerState->SendDamage_ToServer(character, info);
+}
+
 // credit: xCENTx
 void TeleportAllPalsToCrosshair(float mDistance)
 {

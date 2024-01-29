@@ -55,6 +55,8 @@ float GetDistanceToActor(SDK::AActor* pLocal, SDK::AActor* pTarget);
 
 void ForgeActor(SDK::AActor* pTarget, float mDistance, float mHeight = 0.0f, float mAngle = 0.0f);
 
+void SendDamageToActor(SDK::APalCharacter* character, int32 damage, bool bSpoofAttacker = false);
+
 void TeleportAllPalsToCrosshair(float mDistance);
 
 void AddWaypointLocation(std::string wpName);

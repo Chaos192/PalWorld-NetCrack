@@ -15,20 +15,6 @@ std::string rand_str(const int len)
     }
     return str;
 }
-void Damage(SDK::APalCharacter* character, int32 damage)
-{
-    SDK::FPalDamageInfo  info = SDK::FPalDamageInfo();
-    info.AttackElementType = SDK::EPalElementType::Normal;
-    info.Attacker = Config.GetPalPlayerCharacter();
-    info.AttackerGroupID = Config.GetPalPlayerState()->IndividualHandleId.PlayerUId;
-    info.AttackerLevel = 50;
-    info.AttackType = SDK::EPalAttackType::Weapon;
-    info.bApplyNativeDamageValue = true;
-    info.bAttackableToFriend = true;
-    info.IgnoreShield = true;
-    info.NativeDamageValue = damage;
-    Config.GetPalPlayerState()->SendDamage_ToServer(character, info);
-}
 
 int InputTextCallback(ImGuiInputTextCallbackData* data) {
     char inputChar = data->EventChar;
@@ -547,7 +533,7 @@ namespace DX11_Base
                 if (ImGui::Button("Kill"))
                 {
                     if (T[i]->IsA(SDK::APalCharacter::StaticClass()))
-                        Damage(Character, 99999999999);
+                        SendDamageToActor(Character, 99999999999);
                 }
                 ImGui::SameLine();
                 if (ImGui::Button("TP"))
