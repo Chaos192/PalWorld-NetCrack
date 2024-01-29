@@ -7,6 +7,18 @@
 #include "include/Hooking.hpp"
 using namespace DX11_Base;
 
+//  please dont remove , this is useful for a variety of things
+void ClientBGThread()
+{
+    while (g_Running) 
+    {
+        //  test cache runners
+
+        std::this_thread::sleep_for(1ms);
+        std::this_thread::yield();
+    }
+}
+
 DWORD WINAPI MainThread_Initialize()
 {
     g_Console = std::make_unique<Console>();
@@ -29,7 +41,9 @@ DWORD WINAPI MainThread_Initialize()
 #endif
 
     ///  RENDER LOOP
-    g_Running = TRUE;
+    g_Running = TRUE; 
+    
+    std::thread WCMUpdate(ClientBGThread); // Initialize Loops Thread
     while (g_Running)
     {
         if (GetAsyncKeyState(VK_INSERT) & 1)
@@ -38,9 +52,17 @@ DWORD WINAPI MainThread_Initialize()
             g_GameVariables->m_ShowHud = !g_GameVariables->m_ShowMenu;
         
         }
+
+
+        if (g_KillSwitch)
+        {
+            g_KillSwitch = false;
+            g_Hooking->Unhook();
+        }
     }
 
     ///  EXIT
+    WCMUpdate.join(); // Exit Loops Thread
     FreeLibraryAndExitThread(g_hModule, EXIT_SUCCESS);
     return EXIT_SUCCESS;
 }

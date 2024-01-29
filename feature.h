@@ -52,3 +52,11 @@ void RemoveTechPoints(__int32 mPoints);
 void RemoveAncientTechPoint(__int32 mPoints);
 
 float GetDistanceToActor(SDK::AActor* pLocal, SDK::AActor* pTarget);
+
+void ForgeActor(SDK::AActor* pTarget, float mDistance, float mHeight = 0.0f, float mAngle = 0.0f);
+
+void TeleportAllPalsToCrosshair(float mDistance);
+
+void AddWaypointLocation(std::string wpName);
+
+void RenderWaypointsToScreen();
