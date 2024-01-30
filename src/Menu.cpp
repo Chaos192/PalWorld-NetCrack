@@ -783,10 +783,11 @@ namespace DX11_Base
 
         if (Config.IsDeathAura)
             DeathAura(Config.mDeathAuraAmount, Config.mDeathAuraDistance, true);
+
         //  
         //  SetDemiGodMode(Config.IsMuteki);
 
         if (Config.IsGodMode)
-            ReviveLocalPlayer();
+            SetPlayerHealth(INT_MAX);
     }
 }
