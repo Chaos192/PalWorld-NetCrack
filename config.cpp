@@ -164,6 +164,19 @@ bool config::GetTAllPals(SDK::TArray<class SDK::APalCharacter*>* outResult)
     return true;
 }
 
+//  @TODO:
+bool config::GetPartyPals(std::vector<SDK::AActor*>* outResult)
+{
+    return false;
+}
+
+//  @TODO:
+bool config::GetPlayerDeathChests(std::vector<SDK::FVector>* outLocations)
+{
+    return false;
+}
+
+// credit: xCENTx
 bool config::GetAllActorsofType(SDK::UClass* mType, std::vector<SDK::AActor*>* outArray, bool bLoopAllLevels, bool bSkipLocalPlayer)
 {
     SDK::UWorld* pWorld = Config.gWorld;

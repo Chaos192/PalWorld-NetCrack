@@ -52,3 +52,15 @@ void RemoveTechPoints(__int32 mPoints);
 void RemoveAncientTechPoint(__int32 mPoints);
 
 float GetDistanceToActor(SDK::AActor* pLocal, SDK::AActor* pTarget);
+
+void ForgeActor(SDK::AActor* pTarget, float mDistance, float mHeight = 0.0f, float mAngle = 0.0f);
+
+void SendDamageToActor(SDK::APalCharacter* pTarget, int32 damage, bool bSpoofAttacker = false);
+
+void DeathAura(__int32 dmgAmount, float mDistance, bool bIntensityEffect = false, bool bVisualEffect = false, SDK::EPalVisualEffectID visID = SDK::EPalVisualEffectID::None);
+
+void TeleportAllPalsToCrosshair(float mDistance);
+
+void AddWaypointLocation(std::string wpName);
+
+void RenderWaypointsToScreen();

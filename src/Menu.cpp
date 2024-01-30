@@ -15,20 +15,6 @@ std::string rand_str(const int len)
     }
     return str;
 }
-void Damage(SDK::APalCharacter* character, int32 damage)
-{
-    SDK::FPalDamageInfo  info = SDK::FPalDamageInfo();
-    info.AttackElementType = SDK::EPalElementType::Normal;
-    info.Attacker = Config.GetPalPlayerCharacter();
-    info.AttackerGroupID = Config.GetPalPlayerState()->IndividualHandleId.PlayerUId;
-    info.AttackerLevel = 50;
-    info.AttackType = SDK::EPalAttackType::Weapon;
-    info.bApplyNativeDamageValue = true;
-    info.bAttackableToFriend = true;
-    info.IgnoreShield = true;
-    info.NativeDamageValue = damage;
-    Config.GetPalPlayerState()->SendDamage_ToServer(character, info);
-}
 
 int InputTextCallback(ImGuiInputTextCallbackData* data) {
     char inputChar = data->EventChar;
@@ -42,6 +28,8 @@ namespace DX11_Base
 {
     // helper variables
     char inputBuffer_getFnAddr[100];
+    char inputBuffer_getClass[100];
+    char inputBuffer_setWaypoint[32];
 
     namespace Styles 
     {
@@ -377,7 +365,8 @@ namespace DX11_Base
         
         void TABDebug()
         {
-            ImGui::Checkbox("DEBUG ESP", &Config.isDebugESP);
+            if (ImGui::Checkbox("DEBUG ESP", &Config.isDebugESP) && !Config.isDebugESP)
+                Config.mDebugESPDistance = 10.f;
             if (Config.isDebugESP)
             {
                 ImGui::SameLine();
@@ -385,15 +374,56 @@ namespace DX11_Base
                 ImGui::SliderFloat("##DISTANCE", &Config.mDebugESPDistance, 1.0f, 100.f, "%.0f", ImGuiSliderFlags_AlwaysClamp);
             }
 
-            //  @TODO: print additional debug information
-            if (ImGui::Button("PrintPlayerAddr", ImVec2(ImGui::GetContentRegionAvail().x - 3, 20)))
+            if (ImGui::Checkbox("TELEPORT PALS TO XHAIR", &Config.IsTeleportAllToXhair) && !Config.IsTeleportAllToXhair)
+                Config.mDebugEntCapDistance = 10.f;
+            if (Config.IsTeleportAllToXhair)
             {
-                SDK::APalPlayerCharacter* p_appc = Config.GetPalPlayerCharacter();
-                if (p_appc)
-                    g_Console->printdbg("\n\n[+] APalPlayerCharacter: 0x%llX\n", Console::Colors::green, p_appc);
+                ImGui::SameLine();
+                ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+                ImGui::SliderFloat("##ENT_CAP_DISTANCE", &Config.mDebugEntCapDistance, 1.0f, 100.f, "%.0f", ImGuiSliderFlags_AlwaysClamp);
+            }
+            
+            if (ImGui::Checkbox("DEATH AURA", &Config.IsDeathAura) && !Config.IsDeathAura)
+            {
+                Config.mDeathAuraDistance = 10.0f;
+                Config.mDeathAuraAmount = 1;
+            }
+            if (Config.IsDeathAura)
+            {
+                ImGui::SameLine();
+                ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * .7);
+                ImGui::SliderFloat("##AURA_DISTANCE", &Config.mDeathAuraDistance, 1.0f, 100.f, "%.0f", ImGuiSliderFlags_AlwaysClamp);
+                ImGui::SameLine();
+                ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+                ImGui::SliderInt("##AURA_DMG", &Config.mDeathAuraAmount, 1, 10, "%d", ImGuiSliderFlags_AlwaysClamp);
+            }
+
+            if (ImGui::Button("PRINT ENGINE GLOBALS", ImVec2(ImGui::GetContentRegionAvail().x - 3, 20)))
+            {
+
+                g_Console->printdbg("[+] [UNREAL ENGINE GLOBALS]\n"
+                    "UWorld:\t\t\t0x%llX\n"
+                    "ULocalPlayer:\t\t0x%llX\n"
+                    "APalPlayerController:\t0x%llX\n"
+                    "APalPlayerCharacter:\t0x%llX\n"
+                    "APalPlayerState:\t0x%llX\n"
+                    "UCharacterImpMan:\t0x%llX\n"
+                    "UPalPlayerInventory:\t0x%llX\n"
+                    "APalWeaponBase:\t\t0x%llX\n",
+                    Console::Colors::yellow, 
+                    Config.gWorld,
+                    Config.GetLocalPlayer(),
+                    Config.GetPalPlayerController(),
+                    Config.GetPalPlayerCharacter(),
+                    Config.GetPalPlayerState(),
+                    Config.GetCharacterImpManager(),
+                    Config.GetInventoryComponent(),
+                    Config.GetPlayerEquippedWeapon()
+                );
                 
             }
 
+            //  Get Function Pointer Offset
             ImGui::InputTextWithHint("##INPUT", "INPUT GOBJECT fn NAME", inputBuffer_getFnAddr, 100);
             ImGui::SameLine();
             if (ImGui::Button("GET fn", ImVec2(ImGui::GetContentRegionAvail().x, 20)))
@@ -412,6 +442,55 @@ namespace DX11_Base
                 memset(inputBuffer_getFnAddr, 0, 100);
             }
 
+
+            //  Get Class pointer by name
+            ImGui::InputTextWithHint("##INPUT_GETCLASS", "INPUT OBJECT CLASS NAME", inputBuffer_getClass, 100);
+            ImGui::SameLine();
+            if (ImGui::Button("GET CLASS", ImVec2(ImGui::GetContentRegionAvail().x, 20)))
+            {
+                std::string input = inputBuffer_getClass;
+                SDK::UClass* czClass = SDK::UObject::FindObject<SDK::UClass>(input.c_str());
+                if (czClass)
+                {
+                    static __int64 dwHandle = reinterpret_cast<__int64>(GetModuleHandle(0));
+                    g_Console->printdbg("[+] Found [%s] -> 0x%llX\n", Console::Colors::yellow, input.c_str(), czClass->Class);
+                }
+                else
+                    g_Console->printdbg("[!] CLASS [%s] NOT FOUND!\n", Console::Colors::red, input.c_str());
+
+            }
+
+            //  Waypoints
+            ImGui::InputTextWithHint("##INPUT_SETWAYPOINT", "CUSTOM WAYPOINT NAME", inputBuffer_setWaypoint, 32);
+            ImGui::SameLine();
+            if (ImGui::Button("SET", ImVec2(ImGui::GetContentRegionAvail().x, 20)))
+            {
+                std::string wpName = inputBuffer_setWaypoint;
+                if (wpName.size() > 0)
+                {
+                    AddWaypointLocation(wpName);
+                    memset(inputBuffer_setWaypoint, 0, 32);
+                }
+            }
+            if (Config.db_waypoints.size() > 0)
+            {
+                if (ImGui::BeginChild("##CHILD_WAYPOINTS", { 0.0f, 100.f }))
+                {
+                    DWORD index = -1;
+                    for (auto waypoint : Config.db_waypoints)
+                    {
+                        index++;
+                        ImGui::PushID(index);
+                        //  ImGui::Checkbox("SHOW", &waypoint.bIsShown);
+                        //  ImGui::SameLine();
+                        if (ImGui::Button(waypoint.waypointName.c_str(), ImVec2(ImGui::GetContentRegionAvail().x, 20)))
+                            AnyWhereTP(waypoint.waypointLocation, false);
+                        ImGui::PopID();
+                    }
+
+                    ImGui::EndChild();
+                }
+            }
         }
 	}
 
@@ -492,7 +571,7 @@ namespace DX11_Base
                 if (ImGui::Button("Kill"))
                 {
                     if (T[i]->IsA(SDK::APalCharacter::StaticClass()))
-                        Damage(Character, 99999999999);
+                        SendDamageToActor(Character, 99999999999);
                 }
                 ImGui::SameLine();
                 if (ImGui::Button("TP"))
@@ -666,6 +745,9 @@ namespace DX11_Base
         if (Config.isDebugESP)
             ESP_DEBUG(Config.mDebugESPDistance);
 
+        if (Config.db_waypoints.size() > 0)
+            RenderWaypointsToScreen();
+
         ImGui::End();
 	}
 
@@ -685,7 +767,7 @@ namespace DX11_Base
         
         //  
         if (Config.IsAttackModiler)
-            SetPlayerDefenseParam(Config.DamageUp);
+            SetPlayerAttackParam(Config.DamageUp);
 
         //  
         if (Config.IsDefuseModiler)
@@ -695,6 +777,11 @@ namespace DX11_Base
         if (Config.IsInfStamina)
             ResetStamina();
 
+        if (Config.IsTeleportAllToXhair)
+            TeleportAllPalsToCrosshair(Config.mDebugEntCapDistance);
+
+        if (Config.IsDeathAura)
+            DeathAura(Config.mDeathAuraAmount, Config.mDeathAuraDistance, true);
         //  
         //  SetDemiGodMode(Config.IsMuteki);
 
