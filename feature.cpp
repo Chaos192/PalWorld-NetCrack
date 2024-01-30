@@ -311,6 +311,24 @@ void RespawnLocalPlayer(bool bIsSafe)
 	bIsSafe ? pPalPlayerController->TeleportToSafePoint_ToServer() : pPalPlayerState->RequestRespawn();
 }
 
+void SetPlayerHealth(__int32 newHealth)
+{
+	APalPlayerCharacter* pPalPlayerCharacter = Config.GetPalPlayerCharacter();
+	if (!pPalPlayerCharacter)
+		return;
+
+	UPalCharacterParameterComponent* pParams = pPalPlayerCharacter->CharacterParameterComponent;
+	if (!pParams)
+		return;
+
+	FFixedPoint64 maxHP = pParams->GetMaxHP();
+	if (newHealth > maxHP.Value)
+		newHealth = maxHP.Value;
+
+	FFixedPoint newHealthPoint = FFixedPoint(newHealth);
+	pPalPlayerCharacter->ReviveCharacter_ToServer(newHealthPoint);
+}
+
 //	
 void ReviveLocalPlayer()
 {
@@ -318,10 +336,16 @@ void ReviveLocalPlayer()
 	if (!pPalPlayerCharacter)
 		return;
 
-	FFixedPoint newHealthPoint = FFixedPoint(99999999);
-	if (Config.GetPalPlayerCharacter()->CharacterParameterComponent->IsDying())
-		Config.GetPalPlayerCharacter()->CharacterParameterComponent->ReviveFromDying();
-	pPalPlayerCharacter->ReviveCharacter_ToServer(newHealthPoint);
+	UPalCharacterParameterComponent* pParams = pPalPlayerCharacter->CharacterParameterComponent;
+	if (!pParams)
+		return;
+
+	if (pParams->IsDying())
+		pParams->ReviveFromDying();
+
+	FFixedPoint64 maxHP = pParams->GetMaxHP();
+	FFixedPoint newHealth = FFixedPoint(maxHP.Value);
+	pPalPlayerCharacter->ReviveCharacter_ToServer(newHealth);
 }
 
 //	

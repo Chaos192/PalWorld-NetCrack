@@ -29,6 +29,8 @@ void SetDemiGodMode(bool bIsSet);
 
 void RespawnLocalPlayer(bool bIsSafe);
 
+void SetPlayerHealth(__int32 newHealth);
+
 void ReviveLocalPlayer();
 
 void ResetStamina();

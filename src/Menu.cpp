@@ -72,7 +72,8 @@ namespace DX11_Base
 
             ImGui::Checkbox("InfStamina", &Config.IsInfStamina);
 
-            ImGui::Checkbox("InfAmmo", &Config.IsInfinAmmo);
+            if (ImGui::Checkbox("InfAmmo", &Config.IsInfinAmmo))
+                SetInfiniteAmmo(Config.IsInfinAmmo);
 
             ImGui::Checkbox("Godmode", &Config.IsGodMode);
 
@@ -782,23 +783,11 @@ namespace DX11_Base
 
         if (Config.IsDeathAura)
             DeathAura(Config.mDeathAuraAmount, Config.mDeathAuraDistance, true);
+
         //  
         //  SetDemiGodMode(Config.IsMuteki);
 
-        if (Config.GetPalPlayerCharacter() != NULL)
-        {
-            if (Config.GetPalPlayerCharacter()->ShooterComponent != NULL && Config.GetPalPlayerCharacter()->ShooterComponent->GetHasWeapon() != NULL && Config.GetPalPlayerCharacter()->ShooterComponent->CanShoot())
-            {
-                Config.GetPalPlayerCharacter()->ShooterComponent->GetHasWeapon()->IsRequiredBullet = !Config.IsInfinAmmo;
-            }
-        }
         if (Config.IsGodMode)
-        {
-            if (Config.GetPalPlayerCharacter() && Config.GetPalPlayerCharacter()->CharacterParameterComponent && Config.GetPalPlayerCharacter()->CharacterParameterComponent->IndividualParameter)
-            {
-                if (Config.GetPalPlayerCharacter()->CharacterParameterComponent->IndividualParameter->GetHP().Value < INT_MAX)
-                    Config.GetPalPlayerCharacter()->ReviveCharacter_ToServer(SDK::FFixedPoint(INT_MAX));
-            }
-        }
+            SetPlayerHealth(INT_MAX);
     }
 }
