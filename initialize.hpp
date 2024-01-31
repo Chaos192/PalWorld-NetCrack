@@ -1,5 +1,4 @@
 #pragma once
-#include "SDK.hpp"
 #include "config.h"
 #include "include/helper.h"
 #include "include/Console.hpp"
@@ -7,11 +6,15 @@
 #include "include/D3D11Window.hpp"
 #include "include/Hooking.hpp"
 using namespace DX11_Base;
+
+//  please dont remove , this is useful for a variety of things
 void ClientBGThread()
 {
-    while (g_Running) {
-        g_Menu->Loops();
-        std::this_thread::sleep_for(0ms);
+    while (g_Running) 
+    {
+        //  test cache runners
+
+        std::this_thread::sleep_for(1ms);
         std::this_thread::yield();
     }
 }
@@ -21,7 +24,7 @@ DWORD WINAPI MainThread_Initialize()
     g_Console = std::make_unique<Console>();
 #if DEBUG
     g_Console->InitializeConsole("Debug Console");
-    g_Console->printdbg("ImGui Hook - Initializing . . .\n\n", g_Console->color.DEFAULT);
+    g_Console->printdbg("ImGui Hook - Initializing . . .\n\n", Console::Colors::DEFAULT);
 #endif
     ///  ESTABLISH GAME DATA   
     g_GameData = std::make_unique<GameData>();
@@ -34,19 +37,32 @@ DWORD WINAPI MainThread_Initialize()
     g_Hooking->Hook();
 
 #if DEBUG
-    g_Console->printdbg("Main::Initialized\n", g_Console->color.green);
+    g_Console->printdbg("Main::Initialized\nUWorld:\t0x%llX\n", Console::Colors::green, Config.gWorld);
 #endif
 
-    std::thread WCMUpdate(ClientBGThread);	//	Initialize Loops Thread
     ///  RENDER LOOP
-    g_Running = TRUE;
+    g_Running = TRUE; 
+    
+    std::thread WCMUpdate(ClientBGThread); // Initialize Loops Thread
     while (g_Running)
     {
-        if (GetAsyncKeyState(VK_INSERT) & 1) g_GameVariables->m_ShowMenu = !g_GameVariables->m_ShowMenu;
+        if (GetAsyncKeyState(VK_INSERT) & 1)
+        {
+            g_GameVariables->m_ShowMenu = !g_GameVariables->m_ShowMenu;
+            g_GameVariables->m_ShowHud = !g_GameVariables->m_ShowMenu;
+        
+        }
+
+
+        if (g_KillSwitch)
+        {
+            g_KillSwitch = false;
+            g_Hooking->Unhook();
+        }
     }
 
     ///  EXIT
-    WCMUpdate.join();						//	Exit Loops Thread
+    WCMUpdate.join(); // Exit Loops Thread
     FreeLibraryAndExitThread(g_hModule, EXIT_SUCCESS);
     return EXIT_SUCCESS;
 }

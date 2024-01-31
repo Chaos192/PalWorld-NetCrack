@@ -2,7 +2,7 @@
 This is the PalWorld network cracking framework
 modifying player data in the Player tab
 Network cracking in the Exploit tab
-# Note: The master branch does not include visual
+# Note: The master branch does not include visual,but In imperfect branch, we'll add something that isn't on the master branch.
 
 # Player Features
 - Modify Player Speed

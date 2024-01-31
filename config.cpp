@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "config.h"
 #include <algorithm>
+#include "include/Menu.hpp"
 
 config Config;
 
@@ -29,6 +30,7 @@ bool DetourTick(SDK::APalPlayerCharacter* m_this, float DeltaSecond)
         if (m_this->GetPalPlayerController()->IsLocalPlayerController())
         {
             Config.localPlayer = m_this;
+            DX11_Base::g_Menu->Loops();
         }
     }
     return OldTickFunc(m_this, DeltaSecond);
@@ -59,6 +61,19 @@ SDK::UPalCharacterImportanceManager* config::GetCharacterImpManager()
     return static_cast<SDK::UPalGameInstance*>(pGameInstance)->CharacterImportanceManager;
 }
 
+SDK::ULocalPlayer* config::GetLocalPlayer()
+{
+    SDK::UWorld* pWorld = Config.gWorld;
+    if (!pWorld)
+        return nullptr;
+
+    SDK::UGameInstance* pGameInstance = pWorld->OwningGameInstance;
+    if (!pGameInstance)
+        return nullptr;
+    
+    return pGameInstance->LocalPlayers[0];
+}
+
 SDK::APalPlayerCharacter* config::GetPalPlayerCharacter()
 {
 
@@ -67,6 +82,15 @@ SDK::APalPlayerCharacter* config::GetPalPlayerCharacter()
         return Config.localPlayer;
     }
     return nullptr;
+}
+
+SDK::APalPlayerController* config::GetPalPlayerController()
+{
+    SDK::APalPlayerCharacter* pPlayer = GetPalPlayerCharacter();
+    if (!pPlayer)
+        return nullptr;
+
+    return static_cast<SDK::APalPlayerController*>(pPlayer->GetPalPlayerController());
 }
 
 SDK::APalPlayerState* config::GetPalPlayerState()
@@ -140,6 +164,19 @@ bool config::GetTAllPals(SDK::TArray<class SDK::APalCharacter*>* outResult)
     return true;
 }
 
+//  @TODO:
+bool config::GetPartyPals(std::vector<SDK::AActor*>* outResult)
+{
+    return false;
+}
+
+//  @TODO:
+bool config::GetPlayerDeathChests(std::vector<SDK::FVector>* outLocations)
+{
+    return false;
+}
+
+// credit: xCENTx
 bool config::GetAllActorsofType(SDK::UClass* mType, std::vector<SDK::AActor*>* outArray, bool bLoopAllLevels, bool bSkipLocalPlayer)
 {
     SDK::UWorld* pWorld = Config.gWorld;
@@ -158,6 +195,12 @@ bool config::GetAllActorsofType(SDK::UClass* mType, std::vector<SDK::AActor*>* o
     {
         if (!pLevelsArray.IsValidIndex(i))
             continue;
+
+        SDK::ULevel* pLevel = pLevelsArray[i];
+        if (!pLevel && bLoopAllLevels)
+            continue;
+        else if (!pLevel && !bLoopAllLevels)
+            break;
 
         SDK::TArray<SDK::AActor*> pActorsArray = pLevelsArray[i]->Actors;
         __int32 actorsCount = pActorsArray.Count();
@@ -191,6 +234,10 @@ void config::Init()
 {
     //register hook
     Config.ClientBase = (DWORD64)GetModuleHandleA("PalWorld-Win64-Shipping.exe");
+
+    SDK::InitGObjects();
+
+    Config.gWorld = Config.GetUWorld();
 
     TickFunc = (Tick)(Config.ClientBase + Config.offset_Tick);
 

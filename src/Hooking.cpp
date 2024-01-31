@@ -5,7 +5,7 @@ namespace DX11_Base {
 	{
 		MH_Initialize();
 #if DEBUG
-		g_Console->printdbg("Hooking::Initialized\n", g_Console->color.pink);
+		g_Console->printdbg("Hooking::Initialized\n", Console::Colors::pink);
 #endif
 		return;
 	}
@@ -23,7 +23,7 @@ namespace DX11_Base {
 		Config.Init();
 		MH_EnableHook(MH_ALL_HOOKS);
 #if DEBUG
-		g_Console->printdbg("Hooking::Hook Initialized\n", g_Console->color.pink);
+		g_Console->printdbg("Hooking::Hook Initialized\n", Console::Colors::pink);
 #endif
 		return;
 	}
@@ -31,8 +31,10 @@ namespace DX11_Base {
 	void Hooking::Unhook()
 	{
 		g_D3D11Window->Unhook();
-		MH_RemoveHook(MH_ALL_HOOKS);
+		MH_DisableHook((Tick)(Config.ClientBase + Config.offset_Tick));
+		MH_RemoveHook((Tick)(Config.ClientBase + Config.offset_Tick));
 		g_Console->DestroyConsole();
+		g_Running = FALSE;
 		return;
 	}
 }

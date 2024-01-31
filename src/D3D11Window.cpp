@@ -41,6 +41,7 @@ bool HookCursor()
 namespace DX11_Base {
 	static uint64_t* MethodsTable = NULL;
 
+	//	@TODO: boolean for active window
 	LRESULT D3D11Window::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		if (g_GameVariables->m_ShowMenu) {
@@ -60,12 +61,12 @@ namespace DX11_Base {
 			CreateHook(12, (void**)&oID3D11DrawIndexed, MJDrawIndexed);
 			Sleep(1000);
 #if DEBUG
-			g_Console->printdbg("D3D11Window::Hook Initialized\n", g_Console->color.pink);
+			g_Console->printdbg("D3D11Window::Hook Initialized\n", Console::Colors::pink);
 #endif
 			return TRUE;
 		}
 #if DEBUG
-		g_Console->printdbg("[+] D3D11Window::Hook Failed to Initialize\n", g_Console->color.red);
+		g_Console->printdbg("[+] D3D11Window::Hook Failed to Initialize\n", Console::Colors::red);
 #endif
 		return FALSE;
 	}
@@ -165,7 +166,7 @@ namespace DX11_Base {
 			return FALSE;
 		}
 #if DEBUG
-		g_Console->printdbg("D3D11Window::Window Created\n", g_Console->color.pink);
+		g_Console->printdbg("D3D11Window::Window Created\n", Console::Colors::pink);
 #endif
 		return TRUE;
 	}
@@ -178,7 +179,7 @@ namespace DX11_Base {
 			return FALSE;
 		}
 #if DEBUG
-		g_Console->printdbg("D3D11Window::Window Destroyed\n", g_Console->color.pink);
+		g_Console->printdbg("D3D11Window::Window Destroyed\n", Console::Colors::pink);
 #endif
 		return TRUE;
 	}
@@ -208,8 +209,10 @@ namespace DX11_Base {
 			ImGui::GetIO().ImeWindowHandle = g_GameVariables->g_GameWindow;
 			m_OldWndProc = (WNDPROC)SetWindowLongPtr(g_GameVariables->g_GameWindow, GWLP_WNDPROC, (__int3264)(LONG_PTR)WndProc);
 			b_ImGui_Initialized = TRUE;
+			pImGui = GImGui;
+			pViewport = pImGui->Viewports[0];
 #if DEBUG
-			g_Console->printdbg("D3D11Window::Swapchain Initialized\n", g_Console->color.pink);
+			g_Console->printdbg("D3D11Window::Swapchain Initialized\n", Console::Colors::pink);
 #endif
 			return 1;
 		}
@@ -222,12 +225,6 @@ namespace DX11_Base {
 	/// </summary>
 	HRESULT APIENTRY D3D11Window::HookPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags)
 	{
-		if (g_KillSwitch) {
-			g_Hooking->Unhook();
-			g_D3D11Window->oIDXGISwapChainPresent(pSwapChain, SyncInterval, Flags);
-			g_Running = FALSE;
-			return 0;
-		}
 		g_D3D11Window->Overlay(pSwapChain);
 		return g_D3D11Window->oIDXGISwapChainPresent(pSwapChain, SyncInterval, Flags);
 	}

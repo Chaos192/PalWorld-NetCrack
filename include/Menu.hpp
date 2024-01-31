@@ -1,6 +1,5 @@
 #pragma once
 #include "helper.h"
-#include "SDK.hpp"
 #include "Game.hpp"
 #include "D3D11Window.hpp"
 namespace DX11_Base {
